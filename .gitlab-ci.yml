@@ -95,3 +95,7 @@ Build and push (TYPO3 9.5) (PHP 7.2) (Apache) image:
     - docker push crinis/typo3:latest
     - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-apache"; fi
     - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5"; fi
+
+    
+after_script:
+  - docker logout
