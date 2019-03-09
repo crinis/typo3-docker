@@ -113,6 +113,12 @@ PHP FPM versions of the images are available and can be used with any webserver 
 
 I will shortly release a Helm Chart for easy deployment on Kubernetes.
 
+## Limitations
+
+### TYPO3 6.2 setup
+
+Images for TYPO3 6.2 do not support automatic setup and configuration of TYPO3. You have to go through installation steps manually and make modifications in LocalConfiguration.php.
+
 ## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/typo3-docker/tags). 
