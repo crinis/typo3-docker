@@ -26,13 +26,13 @@ If you use [Docker Compose](https://docs.docker.com/compose/) there is an exampl
 
 Create a Docker network
 ```shell
-docker network create db
+docker network create typo3-db
 ```
 
 Start a MySQL container
 
 ```shell
-docker run --volume typo3-mysql:/var/lib/mysql/ --network db \
+docker run -d --volume typo3-mysql:/var/lib/mysql/ --network typo3-db \
     --env MYSQL_DATABASE=typo3 --env MYSQL_USER=typo3 --env MYSQL_PASSWORD=ShouldBeAStrongPassword --env MYSQL_ROOT_PASSWORD=ShouldBeAStrongPassword \
     --name typo3-mysql mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
@@ -40,8 +40,8 @@ docker run --volume typo3-mysql:/var/lib/mysql/ --network db \
 Start the TYPO3 container that is based on the official PHP Docker Image. There is also a FPM version of the image available.
 
 ```shell
-docker run --volume typo3:/var/www/html/ --network db \
-    --env TYPO3_DB_HOST=typo3-mysql --env TYPO3_DB_NAME=typo3 --env TYPO3_DB_USERNAME=typo3 --env TYPO3_DB_PASSWORD=ShouldBeAStrongPassword \ 
+docker run -d -p 80:80 --volume typo3:/var/www/html/ --network typo3-db \
+    --env TYPO3_DB_HOST=typo3-mysql --env TYPO3_DB_NAME=typo3 --env TYPO3_DB_USERNAME=typo3 --env TYPO3_DB_PASSWORD=ShouldBeAStrongPassword \
     --env TYPO3_ADMIN_PASSWORD=ShouldBeAStrongPassword \
     --name typo3 crinis/typo3:9.5-php7.2-apache
 ```
