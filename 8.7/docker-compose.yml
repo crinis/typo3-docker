@@ -1,0 +1,38 @@
+version: "3"
+services:
+
+  typo3:
+    image: crinis/typo3:8.7-php7.2-apache
+    volumes:
+      - typo3:/var/www/html/
+    ports:
+      - 80:80
+    networks:
+      - db
+    environment:
+      TYPO3_ADMIN_USERNAME: 'admin'
+      TYPO3_ADMIN_PASSWORD: 'ShouldBeAStrongPassword'
+      TYPO3_DB_HOST: 'mysql'
+      TYPO3_DB_NAME: 'typo3'
+      TYPO3_DB_USERNAME: 'typo3'
+      TYPO3_DB_PASSWORD: 'ShouldBeAStrongPassword'
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+     - mysql:/var/lib/mysql/
+    networks:
+      - db
+    environment:
+      MYSQL_DATABASE: 'typo3'
+      MYSQL_USER: 'typo3'
+      MYSQL_PASSWORD: 'ShouldBeAStrongPassword'
+      MYSQL_ROOT_PASSWORD: 'ShouldBeAStrongPassword'
+    command: '--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci'
+
+networks:
+  db:
+
+volumes:
+  typo3:
+  mysql:
