@@ -35,7 +35,7 @@ Build and push (TYPO3 8.7) (PHP 7.2) (FPM Alpine) image:
     - docker build --build-arg PHP_IMAGE_TAG=0.1.0-php7.2-fpm-alpine --build-arg CRONTAB_DIRECTORY=/etc/crontabs -t crinis/typo3:8.7-php7.2-fpm-alpine -f 8.7/Dockerfile 8.7/
     - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:8.7-php7.2-fpm-alpine "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-fpm-alpine"; fi
     - docker push crinis/typo3:8.7-php7.2-fpm-alpine
-    - if [ -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-fpm-alpine"; fi
+    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-fpm-alpine"; fi
 
 Build and push (TYPO3 9.5) (PHP 7.2) (FPM Alpine) image:
   stage: BuildFpm
@@ -96,6 +96,6 @@ Build and push (TYPO3 9.5) (PHP 7.2) (Apache) image:
     - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-apache"; fi
     - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5"; fi
 
-    
+
 after_script:
   - docker logout
