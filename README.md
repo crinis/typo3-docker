@@ -96,18 +96,18 @@ I recommend to use the [Docker image tags](https://hub.docker.com/r/crinis/typo3
 
 ##### Apache
 
-* `0.1.0_typo3_6.2-php5.6-apache, 6.2-php5.6-apache, 6.2`
-* `0.1.0_typo3_7.6-php7.1-apache, 7.6-php7.1-apache, 7.6`
-* `0.1.0_typo3_8.7-php7.2-apache, 8.7-php7.2-apache, 8.7`
-* `0.1.0_typo3_9.5-php7.2-apache, 9.5-php7.2-apache, 9.5`
+* `0.1.0-typo3_6.2-php5.6-apache, 6.2-php5.6-apache, 6.2`
+* `0.1.0-typo3_7.6-php7.1-apache, 7.6-php7.1-apache, 7.6`
+* `0.1.0-typo3_8.7-php7.2-apache, 8.7-php7.2-apache, 8.7`
+* `0.1.0-typo3_9.5-php7.2-apache, 9.5-php7.2-apache, 9.5`
 
 ##### PHP FPM
 
 PHP FPM versions of the images are available and can be used with any webserver you like. All of them are based on Alpine.
-* `0.1.0_typo3_6.2-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
-* `0.1.0_typo3_7.6-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
-* `0.1.0_typo3_8.7-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
-* `0.1.0_typo3_9.5-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
+* `0.1.0-typo3_6.2-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
+* `0.1.0-typo3_7.6-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
+* `0.1.0-typo3_8.7-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
+* `0.1.0-typo3_9.5-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
 
 ## Running on Kubernetes
 
