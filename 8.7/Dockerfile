@@ -1,4 +1,4 @@
-ARG PHP_IMAGE_TAG=0.1.0-php7.2-apache
+ARG PHP_IMAGE_TAG=0.1.1-php7.2-apache
 FROM crinis/typo3-php:${PHP_IMAGE_TAG}
 
 ARG TYPO3_VERSION=8.7.24
