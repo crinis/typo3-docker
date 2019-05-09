@@ -1,7 +1,7 @@
 ARG PHP_IMAGE_TAG=0.1.1-php7.2-apache
 FROM crinis/typo3-php:${PHP_IMAGE_TAG}
 
-ARG TYPO3_VERSION=8.7.24
+ARG TYPO3_VERSION=8.7.25
 ENV TYPO3_VERSION="${TYPO3_VERSION}"
 
 RUN wget -qO- get.typo3.org/$TYPO3_VERSION | tar xvz -C /usr/src/ && \
