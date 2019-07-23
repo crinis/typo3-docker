@@ -111,7 +111,7 @@ PHP FPM versions of the images are available and can be used with any webserver 
 
 ## Running on Kubernetes
 
-I will shortly release a Helm Chart for easy deployment on Kubernetes.
+An experimental Helm Chart is available [here](https://github.com/crinis/typo3-helm-chart). There is no documentation yet so read the values.yaml file for variables.
 
 ## Limitations
 
