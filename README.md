@@ -92,22 +92,22 @@ docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d
 
 #### Docker Image Tags
 
-I recommend to use the [Docker image tags](https://hub.docker.com/r/crinis/typo3/tags) starting with the [Git tags](https://github.com/crinis/typo3-docker/tags) of this repository as images containing older TYPO3 Versions might be changed and not be compatible. You should also specify the PHP Version explicitly. A tag used in production should look like this: `0.1.4-typo3_9.5-php7.2-apache`.
+I recommend to use the [Docker image tags](https://hub.docker.com/r/crinis/typo3/tags) starting with the [Git tags](https://github.com/crinis/typo3-docker/tags) of this repository as images containing older TYPO3 Versions might be changed and not be compatible. You should also specify the PHP Version explicitly. A tag used in production should look like this: `0.1.5-typo3_9.5-php7.2-apache`.
 
 ##### Apache
 
-* `0.1.4-typo3_6.2-php5.6-apache, 6.2-php5.6-apache, 6.2`
-* `0.1.4-typo3_7.6-php7.1-apache, 7.6-php7.1-apache, 7.6`
-* `0.1.4-typo3_8.7-php7.2-apache, 8.7-php7.2-apache, 8.7`
-* `0.1.4-typo3_9.5-php7.2-apache, 9.5-php7.2-apache, 9.5`
+* `0.1.5-typo3_6.2-php5.6-apache, 6.2-php5.6-apache, 6.2`
+* `0.1.5-typo3_7.6-php7.1-apache, 7.6-php7.1-apache, 7.6`
+* `0.1.5-typo3_8.7-php7.2-apache, 8.7-php7.2-apache, 8.7`
+* `0.1.5-typo3_9.5-php7.2-apache, 9.5-php7.2-apache, 9.5`
 
 ##### PHP FPM
 
 PHP FPM versions of the images are available and can be used with any webserver you like. All of them are based on Alpine.
-* `0.1.4-typo3_6.2-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
-* `0.1.4-typo3_7.6-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
-* `0.1.4-typo3_8.7-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
-* `0.1.4-typo3_9.5-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
+* `0.1.5-typo3_6.2-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
+* `0.1.5-typo3_7.6-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
+* `0.1.5-typo3_8.7-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
+* `0.1.5-typo3_9.5-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
 
 ## Running on Kubernetes
 
