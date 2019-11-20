@@ -58,7 +58,7 @@ Connect to your Docker host on port 80 and login on /typo3 using the default use
 * `TYPO3_DB_USERNAME` - Database username
 * `TYPO3_DB_PASSWORD` - Database password
 * `TYPO3_SITE_NAME` - Only used during installation (defaults to "TYPO3 CMS")
-* `TYPO3_VERSION` - The exact TYPO3 version for example "9.5.5". Replaces the shipped version of TYPO3 that is part of the image
+* `TYPO3_VERSION` - The exact TYPO3 version for example "9.5.x". Replaces the shipped version of TYPO3 that is part of the image
 * `TYPO3_CONSOLE_VERSION` - The exact version of the [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) extension that is added automatically
 * `TYPO3_CONTEXT` - Could be "Production" or "Development" and is used by TYPO3 to determine if it runs in production or development mode (defaults to "Production")
 * `MODIFY_LOCAL_CONFIGURATION` - Set to "false" to disable modifications to your LocalConfiguration.php (defaults to "true")
@@ -92,22 +92,22 @@ docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d
 
 #### Docker Image Tags
 
-I recommend to use the [Docker image tags](https://hub.docker.com/r/crinis/typo3/tags) starting with the [Git tags](https://github.com/crinis/typo3-docker/tags) of this repository as images containing older TYPO3 Versions might be changed and not be compatible. You should also specify the PHP Version explicitly. A tag used in production should look like this: `0.1.6-typo3_9.5-php7.2-apache`.
+I recommend to use the [image tags](https://hub.docker.com/r/crinis/typo3/tags) containing the exact TYPO3 patch version number like so: crinis/typo3:9.5.x-php7.2-apache. Images specified like that have to be updated manually by changing the tag. It is also possible to specify only up to the TYPO3 minor version like "crinis/typo3:9.5-php7.2-apache". This image will be regularly rebuild including the latest TYPO3 patch version and base image updates available, but might contain non backwards compatible changes which can lead to application failures.
 
 ##### Apache
 
-* `0.1.6-typo3_6.2-php5.6-apache, 6.2-php5.6-apache, 6.2`
-* `0.1.6-typo3_7.6-php7.1-apache, 7.6-php7.1-apache, 7.6`
-* `0.1.6-typo3_8.7-php7.2-apache, 8.7-php7.2-apache, 8.7`
-* `0.1.6-typo3_9.5-php7.2-apache, 9.5-php7.2-apache, 9.5`
+* `6.2.x-php5.6-apache, 6.2-php5.6-apache, 6.2.x, 6.2`
+* `7.6.x-php7.1-apache, 7.6-php7.1-apache, 7.6.x, 7.6`
+* `8.7.x-php7.2-apache, 8.7-php7.2-apache, 8.7.x, 8.7`
+* `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x, 9.5`
 
 ##### PHP FPM
 
 PHP FPM versions of the images are available and can be used with any webserver you like. All of them are based on Alpine.
-* `0.1.6-typo3_6.2-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
-* `0.1.6-typo3_7.6-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
-* `0.1.6-typo3_8.7-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
-* `0.1.6-typo3_9.5-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
+* `6.2.x-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
+* `7.6.x-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
+* `8.7.x-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
+* `9.5.x-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
 
 ## Running on Kubernetes
 
