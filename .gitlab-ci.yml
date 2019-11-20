@@ -11,7 +11,7 @@ before_script:
   - apk update && apk add curl jq
   - >
     function get_minor_version() {
-      TYPO3_MINOR_VERSION=$(basename $(curl -L --head -w '%{url_effective}' https://get.typo3.org/$1 2>/dev/null | tail -n1) .tar.gz)         
+      TYPO3_MINOR_VERSION=$(basename $(curl -L --head -w '%{url_effective}' https://get.typo3.org/$1 2>/dev/null | tail -n1) .tar.gz)
       TYPO3_MINOR_VERSION=${TYPO3_MINOR_VERSION#"typo3_src-"}
       echo $TYPO3_MINOR_VERSION
     }
@@ -28,7 +28,7 @@ build-6.2-php5.6-apache:
     BASE_IMAGE_TAG: "5.6-apache"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
@@ -50,7 +50,7 @@ build-6.2-php5.6-fpm-alpine:
     BASE_IMAGE_TAG: "5.6-fpm-alpine"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
@@ -68,7 +68,7 @@ build-7.6-php7.1-apache:
     BASE_IMAGE_TAG: "7.1-apache"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
@@ -90,7 +90,7 @@ build-7.6-php7.1-fpm-alpine:
     BASE_IMAGE_TAG: "7.1-fpm-alpine"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
@@ -108,7 +108,7 @@ build-8.7-php7.2-apache:
     BASE_IMAGE_TAG: "7.2-apache"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
@@ -130,7 +130,7 @@ build-8.7-php7.2-fpm-alpine:
     BASE_IMAGE_TAG: "7.2-fpm-alpine"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
@@ -148,7 +148,7 @@ build-9.5-php7.2-apache:
     BASE_IMAGE_TAG: "7.2-apache"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
@@ -170,7 +170,7 @@ build-9.5-php7.2-fpm-alpine:
     BASE_IMAGE_TAG: "7.2-fpm-alpine"
     BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
-    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
       docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
