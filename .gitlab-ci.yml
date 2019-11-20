@@ -1,101 +1,186 @@
-stages:
-  - BuildFpm
-  - BuildApache
-
-image: docker:stable
+image: docker:19.03.1
 
 services:
-  - docker:dind
+  - docker:19.03.1-dind
+
+variables:
+  IMAGE_REPOSITORY: crinis/typo3
 
 before_script:
-  - docker info
-  - docker version
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+  - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD https://index.docker.io/v1/
+  - apk update && apk add curl jq
+  - >
+    function get_minor_version() {
+      TYPO3_MINOR_VERSION=$(basename $(curl -L --head -w '%{url_effective}' https://get.typo3.org/$1 2>/dev/null | tail -n1) .tar.gz)         
+      TYPO3_MINOR_VERSION=${TYPO3_MINOR_VERSION#"typo3_src-"}
+      echo $TYPO3_MINOR_VERSION
+    }
+  - >
+    function docker_tag_exists() {
+      TOKEN=$(curl -s -H "Content-Type: application/json" -X POST -d '{"username": "'${DOCKER_HUB_USERNAME}'", "password": "'${DOCKER_HUB_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | jq -r .token)
+      EXISTS=$(curl -s -H "Authorization: JWT ${TOKEN}" https://hub.docker.com/v2/repositories/$1/tags/?page_size=10000 | jq -r "[.results | .[] | .name == \"$2\"] | any")
+      test $EXISTS = true
+    }
 
-
-Build and push (TYPO3 6.2) (PHP 5.6) (FPM Alpine) image:
-  stage: BuildFpm
+build-6.2-php5.6-apache:
+  variables:
+    TYPO3_VERSION: 6.2
+    BASE_IMAGE_TAG: 5.6-apache
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build --build-arg PHP_IMAGE_TAG=0.1.1-php5.6-fpm-alpine --build-arg CRONTAB_DIRECTORY=/etc/crontabs -t crinis/typo3:6.2-php5.6-fpm-alpine -f 6.2/Dockerfile 6.2/
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:6.2-php5.6-fpm-alpine "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2-php5.6-fpm-alpine"; fi
-    - docker push crinis/typo3:6.2-php5.6-fpm-alpine
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2-php5.6-fpm-alpine"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY $TYPO3_MINOR_VERSION; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 7.6) (PHP 7.1) (FPM Alpine) image:
-  stage: BuildFpm
+build-6.2-php5.6-fpm-alpine:
+  variables:
+    TYPO3_VERSION: 6.2
+    BASE_IMAGE_TAG: 5.6-fpm-alpine
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build --build-arg PHP_IMAGE_TAG=0.1.1-php7.1-fpm-alpine --build-arg CRONTAB_DIRECTORY=/etc/crontabs -t crinis/typo3:7.6-php7.1-fpm-alpine -f 7.6/Dockerfile 7.6/
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:7.6-php7.1-fpm-alpine "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6-php7.1-fpm-alpine"; fi
-    - docker push crinis/typo3:7.6-php7.1-fpm-alpine
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6-php7.1-fpm-alpine"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY "${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}"; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 8.7) (PHP 7.2) (FPM Alpine) image:
-  stage: BuildFpm
+build-7.6-php7.1-apache:
+  variables:
+    TYPO3_VERSION: 7.6
+    BASE_IMAGE_TAG: 7.1-apache
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build --build-arg PHP_IMAGE_TAG=0.1.1-php7.2-fpm-alpine --build-arg CRONTAB_DIRECTORY=/etc/crontabs -t crinis/typo3:8.7-php7.2-fpm-alpine -f 8.7/Dockerfile 8.7/
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:8.7-php7.2-fpm-alpine "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-fpm-alpine"; fi
-    - docker push crinis/typo3:8.7-php7.2-fpm-alpine
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-fpm-alpine"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY $TYPO3_MINOR_VERSION; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 9.5) (PHP 7.2) (FPM Alpine) image:
-  stage: BuildFpm
+build-7.6-php7.1-fpm-alpine:
+  variables:
+    TYPO3_VERSION: 7.6
+    BASE_IMAGE_TAG: 7.1-fpm-alpine
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build --build-arg PHP_IMAGE_TAG=0.1.1-php7.2-fpm-alpine --build-arg CRONTAB_DIRECTORY=/etc/crontabs -t crinis/typo3:9.5-php7.2-fpm-alpine -f 9.5/Dockerfile 9.5/
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:9.5-php7.2-fpm-alpine "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-fpm-alpine"; fi
-    - docker push crinis/typo3:9.5-php7.2-fpm-alpine
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-fpm-alpine"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY "${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}"; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-
-Build and push (TYPO3 6.2) (PHP 5.6) (Apache) image:
-  stage: BuildApache
+build-8.7-php7.2-apache:
+  variables:
+    TYPO3_VERSION: 8.7
+    BASE_IMAGE_TAG: 7.2-apache
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build -t crinis/typo3:6.2-php5.6-apache -f 6.2/Dockerfile 6.2/
-    - docker tag crinis/typo3:6.2-php5.6-apache crinis/typo3:6.2
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:6.2-php5.6-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2-php5.6-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:6.2-php5.6-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2"; fi
-    - docker push crinis/typo3:6.2-php5.6-apache
-    - docker push crinis/typo3:6.2
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2-php5.6-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_6.2"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY $TYPO3_MINOR_VERSION; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 7.6) (PHP 7.1) (Apache) image:
-  stage: BuildApache
+build-8.7-php7.2-fpm-alpine:
+  variables:
+    TYPO3_VERSION: 8.7
+    BASE_IMAGE_TAG: 7.2-fpm-alpine
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build -t crinis/typo3:7.6-php7.1-apache -f 7.6/Dockerfile 7.6/
-    - docker tag crinis/typo3:7.6-php7.1-apache crinis/typo3:7.6
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:7.6-php7.1-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6-php7.1-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:7.6-php7.1-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6"; fi
-    - docker push crinis/typo3:7.6-php7.1-apache
-    - docker push crinis/typo3:7.6
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6-php7.1-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_7.6"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY "${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}"; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 8.7) (PHP 7.2) (Apache) image:
-  stage: BuildApache
+build-9.5-php7.2-apache:
+  variables:
+    TYPO3_VERSION: 9.5
+    BASE_IMAGE_TAG: 7.2-apache
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build -t crinis/typo3:8.7-php7.2-apache -f 8.7/Dockerfile 8.7/
-    - docker tag crinis/typo3:8.7-php7.2-apache crinis/typo3:8.7
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:8.7-php7.2-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:8.7-php7.2-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7"; fi
-    - docker push crinis/typo3:8.7-php7.2-apache
-    - docker push crinis/typo3:8.7
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7-php7.2-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_8.7"; fi
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY $TYPO3_MINOR_VERSION; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
-Build and push (TYPO3 9.5) (PHP 7.2) (Apache) image:
-  stage: BuildApache
+build-9.5-php7.2-fpm-alpine:
+  variables:
+    TYPO3_VERSION: 9.5
+    BASE_IMAGE_TAG: 7.2-fpm-alpine
+    BASE_IMAGE_TAG_VERSION: 0.2.0
   script:
-    - docker build -t crinis/typo3:9.5-php7.2-apache -f 9.5/Dockerfile 9.5/
-    - docker tag crinis/typo3:9.5-php7.2-apache crinis/typo3:9.5
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:9.5-php7.2-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker tag crinis/typo3:9.5-php7.2-apache "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5"; fi
-    - docker tag crinis/typo3:9.5-php7.2-apache crinis/typo3:latest
-    - docker push crinis/typo3:9.5-php7.2-apache
-    - docker push crinis/typo3:9.5
-    - docker push crinis/typo3:latest
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5-php7.2-apache"; fi
-    - if [ ! -z ${CI_COMMIT_TAG+x} ]; then docker push "crinis/typo3:${CI_COMMIT_TAG}-typo3_9.5"; fi
-
+    - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
+    - >
+      docker build -t ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG}-${BASE_IMAGE_TAG_VERSION} \
+        -f ${TYPO3_VERSION}/Dockerfile ${TYPO3_VERSION}/
+    - docker push ${IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $IMAGE_REPOSITORY "${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}"; then
+        docker push ${IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+      fi
 
 after_script:
   - docker logout
