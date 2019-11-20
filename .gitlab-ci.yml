@@ -4,7 +4,7 @@ services:
   - docker:19.03.1-dind
 
 variables:
-  IMAGE_REPOSITORY: crinis/typo3
+  IMAGE_REPOSITORY: "crinis/typo3"
 
 before_script:
   - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD https://index.docker.io/v1/
@@ -24,9 +24,9 @@ before_script:
 
 build-6.2-php5.6-apache:
   variables:
-    TYPO3_VERSION: 6.2
-    BASE_IMAGE_TAG: 5.6-apache
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "6.2"
+    BASE_IMAGE_TAG: "5.6-apache"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -46,9 +46,9 @@ build-6.2-php5.6-apache:
 
 build-6.2-php5.6-fpm-alpine:
   variables:
-    TYPO3_VERSION: 6.2
-    BASE_IMAGE_TAG: 5.6-fpm-alpine
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "6.2"
+    BASE_IMAGE_TAG: "5.6-fpm-alpine"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -64,9 +64,9 @@ build-6.2-php5.6-fpm-alpine:
 
 build-7.6-php7.1-apache:
   variables:
-    TYPO3_VERSION: 7.6
-    BASE_IMAGE_TAG: 7.1-apache
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "7.6"
+    BASE_IMAGE_TAG: "7.1-apache"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -86,9 +86,9 @@ build-7.6-php7.1-apache:
 
 build-7.6-php7.1-fpm-alpine:
   variables:
-    TYPO3_VERSION: 7.6
-    BASE_IMAGE_TAG: 7.1-fpm-alpine
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "7.6"
+    BASE_IMAGE_TAG: "7.1-fpm-alpine"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -104,9 +104,9 @@ build-7.6-php7.1-fpm-alpine:
 
 build-8.7-php7.2-apache:
   variables:
-    TYPO3_VERSION: 8.7
-    BASE_IMAGE_TAG: 7.2-apache
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "8.7"
+    BASE_IMAGE_TAG: "7.2-apache"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -126,9 +126,9 @@ build-8.7-php7.2-apache:
 
 build-8.7-php7.2-fpm-alpine:
   variables:
-    TYPO3_VERSION: 8.7
-    BASE_IMAGE_TAG: 7.2-fpm-alpine
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "8.7"
+    BASE_IMAGE_TAG: "7.2-fpm-alpine"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -144,9 +144,9 @@ build-8.7-php7.2-fpm-alpine:
 
 build-9.5-php7.2-apache:
   variables:
-    TYPO3_VERSION: 9.5
-    BASE_IMAGE_TAG: 7.2-apache
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "9.5"
+    BASE_IMAGE_TAG: "7.2-apache"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
@@ -166,9 +166,9 @@ build-9.5-php7.2-apache:
 
 build-9.5-php7.2-fpm-alpine:
   variables:
-    TYPO3_VERSION: 9.5
-    BASE_IMAGE_TAG: 7.2-fpm-alpine
-    BASE_IMAGE_TAG_VERSION: 0.2.0
+    TYPO3_VERSION: "9.5"
+    BASE_IMAGE_TAG: "7.2-fpm-alpine"
+    BASE_IMAGE_TAG_VERSION: "0.2.0"
   script:
     - $TYPO3_MINOR_VERSION=$(get_minor_version $TYPO3_VERSION)
     - >
