@@ -18,7 +18,7 @@ ARG CRONTAB_DIRECTORY="/var/spool/cron/crontabs"
 RUN chmod +x /docker/docker-typo3-entrypoint.sh /docker/wait-for-it.sh && \ 
     echo "*/15 * * * * /usr/local/bin/php /var/www/html/typo3/sysext/core/bin/typo3 scheduler:run" > $CRONTAB_DIRECTORY/www-data
 
-ARG TYPO3_CONSOLE_VERSION=5.6.0
+ARG TYPO3_CONSOLE_VERSION=5.7.2
 ARG START_CMD=apache2-foreground
 ENV TYPO3_CONSOLE_VERSION="${TYPO3_CONSOLE_VERSION}" \
     TYPO3_CONTEXT="Production" \
