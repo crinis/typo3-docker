@@ -33,7 +33,7 @@ build-6.2-php5.6-apache:
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_MINOR_VERSION=${TYPO3_VERSION} \
+        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
         --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
         -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
     - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
@@ -73,7 +73,7 @@ build-7.6-php7.1-apache:
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_MINOR_VERSION=${TYPO3_VERSION} \
+        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
         --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
         -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
     - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
@@ -113,7 +113,7 @@ build-8.7-php7.2-apache:
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_MINOR_VERSION=${TYPO3_VERSION} \
+        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
         --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
         -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
     - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
@@ -154,7 +154,7 @@ build-9.5-php7.2-apache:
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:latest \
-        --build-arg TYPO3_MINOR_VERSION=${TYPO3_VERSION} \
+        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
         --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
         -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
     - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}

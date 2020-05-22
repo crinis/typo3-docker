@@ -6,10 +6,10 @@ ARG TYPO3_CONSOLE_VERSION="4.9.6"
 ENV TYPO3_VERSION=$TYPO3_VERSION \
     TYPO3_CONSOLE_VERSION=$TYPO3_CONSOLE_VERSION
 
-RUN wget -qO- get.typo3.org/$TYPO3_VERSION | tar xvz -C /usr/src/ && \
+RUN wget -qO- "get.typo3.org/${TYPO3_VERSION}" | tar xvz -C /usr/src/ && \
     mkdir -p /docker/config
 
-RUN wget https://extensions.typo3.org/extension/download/typo3_console/$TYPO3_CONSOLE_VERSION/zip/ -O typo3_console.zip && \
+RUN wget "https://extensions.typo3.org/extension/download/typo3_console/${TYPO3_CONSOLE_VERSION}/zip/" -O typo3_console.zip && \
     unzip typo3_console.zip -d /usr/src/typo3_console/ && \
     rm typo3_console.zip && \
     chmod +x /usr/src/typo3_console/Scripts/typo3cms

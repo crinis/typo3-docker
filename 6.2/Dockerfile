@@ -4,7 +4,7 @@ FROM crinis/typo3-php:${BASE_IMAGE_TAG}
 ARG TYPO3_VERSION
 ENV TYPO3_VERSION=$TYPO3_VERSION
 
-RUN wget -qO- get.typo3.org/$TYPO3_VERSION | tar xvz -C /usr/src/ && \
+RUN wget -qO- "get.typo3.org/${TYPO3_VERSION}" | tar xvz -C /usr/src/ && \
     mkdir -p /docker/config
 
 COPY config/AdditionalConfiguration.php /docker/config/AdditionalConfiguration.php
