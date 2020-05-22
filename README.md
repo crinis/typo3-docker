@@ -8,7 +8,7 @@ The Docker images in this project are not yet production ready and might be modi
 
 ## Getting Started
 
-These instructions will cover usage information for the docker container 
+These instructions cover usage information for the Docker image.
 
 ### Prerequisities
 
