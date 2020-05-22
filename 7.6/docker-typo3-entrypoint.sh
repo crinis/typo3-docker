@@ -26,85 +26,63 @@ file_env() {
 	unset "$fileVar"
 }
 
-if [ ! -d /var/www/html ]; then
-    mkdir -p /var/www/html
+if [ ! -d /var/www/html/ ]; then
+    mkdir -p /var/www/html/
 fi
 
-if [ ! -f /var/www/html/.htaccess ]; then
-    cp /docker/config/htaccess /var/www/html/.htaccess
-fi
-
-if [ ! -d /var/www/html/typo3conf ]; then
-    mkdir /var/www/html/typo3conf
+if [ ! -d /var/www/html/typo3conf/ext ]; then
+    mkdir -p /var/www/html/typo3conf/ext/
 fi
 
 if [ ! -d /var/www/html/typo3conf/ext/typo3_console ] && [ ! -f /var/www/html/typo3cms ]; then
-
-    mkdir -p /var/www/html/typo3conf/ext/typo3_console
-    wget https://extensions.typo3.org/extension/download/typo3_console/$TYPO3_CONSOLE_VERSION/zip/ -O typo3_console.zip
-    unzip typo3_console.zip -d /var/www/html/typo3conf/ext/typo3_console/
-    rm typo3_console.zip
-fi
-
-if [ ! -f /var/www/html/typo3cms ]; then
-
-    chmod +x /var/www/html/typo3conf/ext/typo3_console/Scripts/typo3cms
+    cp -r /usr/src/typo3_console/ /var/www/html/typo3conf/ext/typo3_console/
     ln -s /var/www/html/typo3conf/ext/typo3_console/Scripts/typo3cms /var/www/html/typo3cms
+
+    export REMOVE_TYPO3_CONSOLE=true
 fi
 
-if [ ! -d /var/www/html/typo3_src-$TYPO3_VERSION ] && [ ! -d /usr/src/typo3_src-$TYPO3_VERSION ]; then
-    wget -qO- get.typo3.org/$TYPO3_VERSION | tar xvz -C /var/www/html
-fi
+if [ $SETUP_TYPO3_SRC == true ] && [ -d "/usr/src/typo3_src-${TYPO3_VERSION}/" ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}" ]; then
 
-if [ -d /var/www/html/typo3_src-$TYPO3_VERSION ] && [ "$(readlink /var/www/html/typo3_src)" != "typo3_src-${TYPO3_VERSION}" ]; then 
-    ln -sfn typo3_src-$TYPO3_VERSION /var/www/html/typo3_src
-elif [ -d /usr/src/typo3_src-$TYPO3_VERSION ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}" ]; then
-    ln -sfn /usr/src/typo3_src-$TYPO3_VERSION /var/www/html/typo3_src
-fi
+    ln -sfn "/usr/src/typo3_src-${TYPO3_VERSION}/" /var/www/html/typo3_src
 
-if [ ! -f /var/www/html/index.php ]; then
-    ln -s typo3_src/index.php /var/www/html/index.php
-fi
+    if [ ! -f /var/www/html/index.php ]; then
+        ln -s typo3_src/index.php /var/www/html/index.php
+    fi
 
-if [ ! -d /var/www/html/typo3 ]; then
-    ln -s typo3_src/typo3 /var/www/html/typo3
-fi
+    if [ ! -d /var/www/html/typo3 ]; then
+        ln -s typo3_src/typo3/ /var/www/html/typo3
+    fi
 
-if [ "$CLEANUP_TYPO_SRC" == "true" ]; then
-    find /var/www/html -maxdepth 1 -name "typo3_src-*" -not -name "typo3_src-${TYPO3_VERSION}" -prune -exec rm -rf {} \;
+    export FLUSH_CACHES=true
 fi
 
 file_env "TYPO3_DB_HOST"
-file_env "TYPO3_DB_PORT" "3306"
-
-if [ -z "$TYPO3_DB_HOST" ]; then
-    echo >&2 "error: there is no database host specified "
-    echo >&2 "  You need to specify TYPO3_DB_HOST for the setup process to connect to the database"
-    exit 1
-fi
-
+file_env "TYPO3_DB_PORT" 3306
 file_env "TYPO3_DB_NAME"
+file_env "TYPO3_ADMIN_USERNAME" "admin"
+file_env "TYPO3_ADMIN_PASSWORD"
 
-if [ -z "$TYPO3_DB_NAME" ]; then
-    echo >&2 "error: there is no name of an existing database specified "
-    echo >&2 "  You need to specify TYPO3_DB_NAME"
-    exit 1
-fi
+if [ $SETUP_TYPO3 == true ] && [ ! -f /var/www/html/typo3conf/LocalConfiguration.php ]; then
 
-file_env "TYPO3_SITE_NAME" "TYPO3 CMS"
+    if [ -z ${TYPO3_DB_HOST+x} ]; then
+        echo >&2 "error: there is no database host specified "
+        echo >&2 "  You need to specify TYPO3_DB_HOST for the setup process to connect to the database"
+        exit 1
+    fi
 
-if [ ! -f /var/www/html/typo3conf/LocalConfiguration.php ]; then
+    if [ -z ${TYPO3_DB_NAME+x} ]; then
+        echo >&2 "error: there is no name of an existing database specified "
+        echo >&2 "  You need to specify TYPO3_DB_NAME"
+        exit 1
+    fi
 
-    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
-
-    file_env "TYPO3_ADMIN_USERNAME" "admin"
-    file_env "TYPO3_ADMIN_PASSWORD"
-
-    if [ -z "$TYPO3_ADMIN_PASSWORD" ]; then
+    if [ -z ${TYPO3_ADMIN_PASSWORD+x} ]; then
         echo >&2 "error: there is no admin password specified "
         echo >&2 "  You need to specify TYPO3_ADMIN_PASSWORD for the setup process to work"
         exit 1
     fi
+
+    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
 
     eval "/var/www/html/typo3cms install:setup --non-interactive \
         --database-user-name='${TYPO3_DB_USERNAME}' \
@@ -117,43 +95,53 @@ if [ ! -f /var/www/html/typo3conf/LocalConfiguration.php ]; then
         --site-name='${TYPO3_SITE_NAME}' \
         --use-existing-database \
         --site-setup-type='site'"
+
+    if [ ! -f /var/www/html/.htaccess ]; then
+        cp /var/www/html/typo3_src/_.htaccess /var/www/html/.htaccess
+    fi
+
+    if [ ! -f /var/www/html/typo3conf/AdditionalConfiguration.php ]; then
+        cp /docker/config/AdditionalConfiguration.php /var/www/html/typo3conf/AdditionalConfiguration.php
+    fi
 fi
 
-if [ "$MODIFY_LOCAL_CONFIGURATION" == "true" ] && [ -f /var/www/html/typo3conf/LocalConfiguration.php ] ; then
+if [ $MODIFY_LOCAL_CONFIGURATION == true ] && [ -f /var/www/html/typo3conf/LocalConfiguration.php ] ; then
 
-    if [ ! -z {$TYPO3_DB_HOST+x} ] ; then
-
+    if [ ! -z ${TYPO3_DB_HOST+x} ]; then
         eval "/var/www/html/typo3cms configuration:set DB/host '${TYPO3_DB_HOST}'"
     fi
 
-    if [ ! -z ${TYPO3_DB_PORT+x} ] ; then
-
+    if [ ! -z ${TYPO3_DB_PORT+x} ]; then
         eval "/var/www/html/typo3cms configuration:set DB/port '${TYPO3_DB_PORT}'"
     fi
 
-    if [ ! -z ${TYPO3_DB_NAME+x} ] ; then
-
+    if [ ! -z ${TYPO3_DB_NAME+x} ]; then
         eval "/var/www/html/typo3cms configuration:set DB/database '${TYPO3_DB_NAME}'"
     fi
 
-    if [ ! -z ${TYPO3_DB_USERNAME+x} ] ; then
-
+    if [ ! -z ${TYPO3_DB_USERNAME+x} ]; then
         eval "/var/www/html/typo3cms configuration:set DB/username '${TYPO3_DB_USERNAME}'"
     fi
 
-    if [ ! -z ${TYPO3_DB_PASSWORD+x} ] ; then
-
+    if [ ! -z ${TYPO3_DB_PASSWORD+x} ]; then
         eval "/var/www/html/typo3cms configuration:set DB/password '${TYPO3_DB_PASSWORD}'"
     fi
 
-    php -f /docker/OverrideLocalConfiguration.php
+    if [ ! -z ${TYPO3_SITE_NAME+x} ]; then
+        eval "/var/www/html/typo3cms configuration:set SYS/sitename '${TYPO3_SITE_NAME}'"
+    fi
 fi
 
-if [ ! -f /var/www/html/typo3conf/AdditionalConfiguration.php ]; then
-    cp /docker/config/AdditionalConfiguration.php /var/www/html/typo3conf/AdditionalConfiguration.php
+chown -R www-data:www-data /var/www/html/
+
+if [ ! -z ${FLUSH_CACHES+x} ] && [ $FLUSH_CACHES == true ] ; then
+    /var/www/html/typo3cms cache:flush
 fi
 
-chown -R www-data:www-data /var/www/html
+if [ ! -z ${REMOVE_TYPO3_CONSOLE+x} ] && [ $REMOVE_TYPO3_CONSOLE == true ] ; then
+    rm /var/www/html/typo3cms
+    rm -r /var/www/html/typo3conf/ext/typo3_console/
+fi
 
 secretEnvs=(
     TYPO3_DB_HOST

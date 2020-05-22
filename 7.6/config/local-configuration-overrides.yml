@@ -1,4 +1,0 @@
----
-SYS:
-  fileCreateMask: '0660'
-  folderCreateMask: '2770'
