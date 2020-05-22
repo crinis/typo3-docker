@@ -58,7 +58,6 @@ Connect to your Docker host on port 80 and login on /typo3 using the default use
 * `TYPO3_DB_USERNAME` - Database username.
 * `TYPO3_DB_PASSWORD` - Database password.
 * `TYPO3_SITE_NAME` - Sets the sites title. (defaults to "TYPO3 CMS")
-* `TYPO3_CONSOLE_VERSION` - The exact version of the [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) extension that is added automatically.
 * `TYPO3_CONTEXT` - Could be "Production" or "Development" and is used by TYPO3 to determine if it runs in production or development mode. (defaults to "Production")
 * `MODIFY_LOCAL_CONFIGURATION` - Set to "false" to disable modifications to your LocalConfiguration.php. (defaults to "true")
 * `SETUP_TYPO3_SRC` - Setup symlinks for TYPO3 source that is shipped with the image. (defaults to "true")
