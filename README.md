@@ -97,7 +97,7 @@ I recommend to use the [image tags](https://hub.docker.com/r/crinis/typo3/tags) 
 * `6.2.x-php5.6-apache, 6.2-php5.6-apache, 6.2.x, 6.2`
 * `7.6.x-php7.1-apache, 7.6-php7.1-apache, 7.6.x, 7.6`
 * `8.7.x-php7.2-apache, 8.7-php7.2-apache, 8.7.x, 8.7`
-* `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x, 9.5`
+* `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x-php7.3-apache, 9.5-php7.3-apache, 9.5.x-php7.4-apache, 9.5-php7.4-apache, 9.5.x, 9.5`
 
 ##### PHP FPM
 
@@ -105,7 +105,7 @@ Experimental PHP FPM versions of the images are available and can be used with a
 * `6.2.x-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
 * `7.6.x-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
 * `8.7.x-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
-* `9.5.x-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine`
+* `9.5.x-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine, 9.5.x-php7.3-fpm-alpine, 9.5-php7.3-fpm-alpine, 9.5.x-php7.4-fpm-alpine, 9.5-php7.4-fpm-alpine`
 
 ## Running on Kubernetes
 
