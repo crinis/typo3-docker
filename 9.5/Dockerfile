@@ -1,4 +1,4 @@
-ARG BASE_IMAGE_TAG=7.2-apache
+ARG BASE_IMAGE_TAG=7.4-apache
 FROM crinis/typo3-php:${BASE_IMAGE_TAG}
 
 ARG TYPO3_VERSION
