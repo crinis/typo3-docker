@@ -90,7 +90,7 @@ docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d
 
 #### Docker Image Tags
 
-I recommend to use the [image tags](https://hub.docker.com/r/crinis/typo3/tags) containing the exact TYPO3 version number including patch version like so: crinis/typo3:9.5.x-php7.2-apache. Images specified like that have to be updated manually by changing the tag. It is also possible to specify only the TYPO3 minor version like "crinis/typo3:9.5-php7.2-apache". This image will be regularly rebuild including the latest TYPO3 patch version and base image, but might contain non backwards compatible changes which can lead to application failures.
+I recommend to use the image tags containing the exact TYPO3 version number including patch version like so: crinis/typo3:9.5.18-php7.4-apache. Images specified like that have to be updated manually by changing the tag. It is also possible to specify only the TYPO3 minor version like "crinis/typo3:9.5-php7.2-apache". This image will be regularly rebuild including the latest TYPO3 patch version and base image, but might contain non backwards compatible changes which can lead to application failures.
 
 ##### Apache
 
