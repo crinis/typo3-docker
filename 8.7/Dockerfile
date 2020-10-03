@@ -26,7 +26,8 @@ ENV TYPO3_CONTEXT="Production" \
     SETUP_TYPO3_SRC=true \
     SETUP_TYPO3=true \
     MODIFY_LOCAL_CONFIGURATION=true \
-    TYPO3_SITE_NAME="TYPO3 CMS"
+    TYPO3_SITE_NAME="TYPO3 CMS" \
+    TYPO3_SITE_SETUP_TYPE="site"
 
 ENTRYPOINT ["/docker/docker-typo3-entrypoint.sh"]
 CMD ["supervisord", "-c", "/etc/supervisor/supervisord.conf"]

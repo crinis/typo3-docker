@@ -94,7 +94,7 @@ if [ $SETUP_TYPO3 == true ] && [ ! -f /var/www/html/typo3conf/LocalConfiguration
         --admin-password='${TYPO3_ADMIN_PASSWORD}' \
         --site-name='${TYPO3_SITE_NAME}' \
         --use-existing-database \
-        --site-setup-type='site' \
+        --site-setup-type='${TYPO3_SITE_SETUP_TYPE}' \
         --web-server-config='apache'"
 
     if [ ! -f /var/www/html/typo3conf/AdditionalConfiguration.php ]; then
