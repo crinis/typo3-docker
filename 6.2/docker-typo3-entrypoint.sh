@@ -31,6 +31,8 @@ if [ $SETUP_TYPO3 == true ] && [ ! -f /var/www/html/typo3conf/LocalConfiguration
         mkdir -p /var/www/html/typo3conf/
     fi
 
+    touch /var/www/html/typo3conf/ENABLE_INSTALL_TOOL
+
     if [ ! -f /var/www/html/typo3conf/AdditionalConfiguration.php ]; then
         cp /docker/config/AdditionalConfiguration.php /var/www/html/typo3conf/AdditionalConfiguration.php
     fi
