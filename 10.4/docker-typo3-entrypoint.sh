@@ -133,7 +133,7 @@ chown -R www-data:www-data /var/www/html/
 
 if [ ! -z ${FLUSH_CACHES+x} ] && [ $FLUSH_CACHES == true ] && [ ! -z ${TYPO3_DB_HOST+x} ] && [ ! -z ${TYPO3_DB_PORT+x} ] ; then
     /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
-    /var/www/html/typo3cms cache:flush
+    /var/www/html/typo3cms cache:flush || true
 fi
 
 if [ ! -z ${REMOVE_TYPO3_CONSOLE+x} ] && [ $REMOVE_TYPO3_CONSOLE == true ] ; then
