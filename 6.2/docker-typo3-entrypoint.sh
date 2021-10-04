@@ -8,7 +8,7 @@ if [ ! -d /var/www/html/ ]; then
     mkdir -p /var/www/html/
 fi
 
-if [ $SETUP_TYPO3_SRC == true ] && [ -d "/usr/src/typo3_src-${TYPO3_VERSION}/" ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}" ]; then
+if [ $SETUP_TYPO3_SRC == true ] && [ -d "/usr/src/typo3_src-${TYPO3_VERSION}/" ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}/" ]; then
 
     ln -sfn "/usr/src/typo3_src-${TYPO3_VERSION}/" /var/www/html/typo3_src
 

@@ -41,7 +41,7 @@ if [ ! -d /var/www/html/typo3conf/ext/typo3_console ] && [ ! -f /var/www/html/ty
     export REMOVE_TYPO3_CONSOLE=true
 fi
 
-if [ $SETUP_TYPO3_SRC == true ] && [ -d "/usr/src/typo3_src-${TYPO3_VERSION}/" ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}" ]; then
+if [ $SETUP_TYPO3_SRC == true ] && [ -d "/usr/src/typo3_src-${TYPO3_VERSION}/" ] && [ "$(readlink /var/www/html/typo3_src)" != "/usr/src/typo3_src-${TYPO3_VERSION}/" ]; then
 
     ln -sfn "/usr/src/typo3_src-${TYPO3_VERSION}/" /var/www/html/typo3_src
 
@@ -131,7 +131,8 @@ fi
 
 chown -R www-data:www-data /var/www/html/
 
-if [ ! -z ${FLUSH_CACHES+x} ] && [ $FLUSH_CACHES == true ] ; then
+if [ ! -z ${FLUSH_CACHES+x} ] && [ $FLUSH_CACHES == true ] && [ ! -z ${TYPO3_DB_HOST+x} ] && [ ! -z ${TYPO3_DB_PORT+x} ] ; then
+    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
     /var/www/html/typo3cms cache:flush
 fi
 
