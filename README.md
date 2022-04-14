@@ -37,7 +37,7 @@ docker run -d --volume typo3-mysql:/var/lib/mysql/ --network typo3-db \
     --name typo3-mysql mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
-Start the TYPO3 container that is based on the official PHP Docker Image. There is also a FPM version of the image available.
+Start the TYPO3 container that is based on the official PHP Docker Image.
 
 ```shell
 docker run -d -p 80:80 --volume typo3:/var/www/html/ --network typo3-db \
@@ -86,7 +86,7 @@ docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d
 
 * `/docker/AdditionalConfiguration.php` - This file gets copied to /var/www/html/typo3conf/ if no file with that name exist already during TYPO3 setup.
 * `/docker/htaccess` - Gets copied to /var/www/html/ if no file with that name exists already during TYPO3 setup. Only in TYPO3 7.6 and 6.2.
-* `/etc/supervisor/supervisord.conf` - Supervisor configuration file to manage php-fpm or apache and cron processes.
+* `/etc/supervisor/supervisord.conf` - Supervisor configuration file to manage apache and cron processes.
 
 #### Docker Image Tags
 
@@ -99,15 +99,6 @@ I recommend to use the image tags containing the exact TYPO3 version number incl
 * `8.7.x-php7.2-apache, 8.7-php7.2-apache, 8.7.x, 8.7`
 * `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x-php7.3-apache, 9.5-php7.3-apache, 9.5.x-php7.4-apache, 9.5-php7.4-apache, 9.5.x, 9.5`
 * `10.4.x-php7.4-apache, 10.4-php7.4-apache, 10.4.x, 10.4, latest`
-
-##### PHP FPM
-
-Experimental PHP FPM versions of the images are available and can be used with any webserver you like. All of them are based on Alpine.
-* `6.2.x-php5.6-fpm-alpine, 6.2-php5.6-fpm-alpine`
-* `7.6.x-php7.1-fpm-alpine, 7.6-php7.1-fpm-alpine`
-* `8.7.x-php7.2-fpm-alpine, 8.7-php7.2-fpm-alpine`
-* `9.5.x-php7.2-fpm-alpine, 9.5-php7.2-fpm-alpine, 9.5.x-php7.3-fpm-alpine, 9.5-php7.3-fpm-alpine, 9.5.x-php7.4-fpm-alpine, 9.5-php7.4-fpm-alpine`
-* `10.4.x-php7.4-fpm-alpine, 10.4-php7.4-fpm-alpine`
 
 ## Running on Kubernetes
 

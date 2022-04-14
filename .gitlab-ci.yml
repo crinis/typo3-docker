@@ -44,24 +44,6 @@ build-6.2-php5.6-apache:
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
-build-6.2-php5.6-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "6.2"
-    BASE_IMAGE_TAG: "5.6-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
 build-7.6-php7.1-apache:
   variables:
     TYPO3_MINOR_VERSION: "7.6"
@@ -81,24 +63,6 @@ build-7.6-php7.1-apache:
     - > 
       if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY $TYPO3_VERSION; then
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
-build-7.6-php7.1-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "7.6"
-    BASE_IMAGE_TAG: "7.1-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
@@ -124,24 +88,6 @@ build-8.7-php7.2-apache:
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
-build-8.7-php7.2-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "8.7"
-    BASE_IMAGE_TAG: "7.2-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
 build-9.5-php7.2-apache:
   variables:
     TYPO3_MINOR_VERSION: "9.5"
@@ -160,24 +106,6 @@ build-9.5-php7.2-apache:
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
-build-9.5-php7.2-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "9.5"
-    BASE_IMAGE_TAG: "7.2-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
 build-9.5-php7.3-apache:
   variables:
     TYPO3_MINOR_VERSION: "9.5"
@@ -193,24 +121,6 @@ build-9.5-php7.3-apache:
     - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
     - > 
       if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY ${TYPO3_VERSION}-php${BASE_IMAGE_TAG}; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
-build-9.5-php7.3-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "9.5"
-    BASE_IMAGE_TAG: "7.3-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
@@ -239,24 +149,6 @@ build-9.5-php7.4-apache:
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
-build-9.5-php7.4-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "9.5"
-    BASE_IMAGE_TAG: "7.4-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
 build-10.4-php7.4-apache:
   variables:
     TYPO3_MINOR_VERSION: "10.4"
@@ -281,24 +173,6 @@ build-10.4-php7.4-apache:
       fi
     - > 
       if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY ${TYPO3_VERSION}-php${BASE_IMAGE_TAG}; then
-        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
-      fi
-
-build-10.4-php7.4-fpm-alpine:
-  variables:
-    TYPO3_MINOR_VERSION: "10.4"
-    BASE_IMAGE_TAG: "7.4-fpm-alpine"
-  script:
-    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
-    - >
-      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
-        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
-        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
-        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
-        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
-    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
-    - > 
-      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY "${TYPO3_VERSION}-php${BASE_IMAGE_TAG}"; then
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
 
