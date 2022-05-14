@@ -82,7 +82,7 @@ if [ $SETUP_TYPO3 == true ] && [ ! -f /var/www/html/typo3conf/LocalConfiguration
         exit 1
     fi
 
-    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
+    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 60 -- echo "Database is ready"
 
     eval "/var/www/html/typo3cms install:setup --non-interactive \
         --database-user-name='${TYPO3_DB_USERNAME}' \
@@ -135,7 +135,7 @@ fi
 chown -R www-data:www-data /var/www/html/
 
 if [ ! -z ${FLUSH_CACHES+x} ] && [ $FLUSH_CACHES == true ] && [ ! -z ${TYPO3_DB_HOST+x} ] && [ ! -z ${TYPO3_DB_PORT+x} ] ; then
-    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -- echo "Database is ready"
+    /docker/wait-for-it.sh "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 60 -- echo "Database is ready"
     /var/www/html/typo3cms cache:flush || true
 fi
 
