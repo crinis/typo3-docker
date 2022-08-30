@@ -160,6 +160,31 @@ build-10.4-php7.4-apache:
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
+        --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
+        --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
+        -f ${TYPO3_MINOR_VERSION}/Dockerfile ${TYPO3_MINOR_VERSION}/
+    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}
+    - docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG}
+    - > 
+      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY $TYPO3_VERSION; then
+        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}
+      fi
+    - > 
+      if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY ${TYPO3_VERSION}-php${BASE_IMAGE_TAG}; then
+        docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
+      fi
+
+build-11.5-php8.1-apache:
+  variables:
+    TYPO3_MINOR_VERSION: "11.5"
+    BASE_IMAGE_TAG: "8.1-apache"
+  script:
+    - TYPO3_VERSION=$(get_latest_version $TYPO3_MINOR_VERSION)
+    - >
+      docker build -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION} \
+        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION} \
+        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_MINOR_VERSION}-php${BASE_IMAGE_TAG} \
+        -t ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG} \
         -t ${TYPO3_IMAGE_REPOSITORY}:latest \
         --build-arg TYPO3_VERSION=${TYPO3_VERSION} \
         --build-arg BASE_IMAGE_TAG=${BASE_IMAGE_TAG} \
@@ -175,6 +200,6 @@ build-10.4-php7.4-apache:
       if ! docker_tag_exists $TYPO3_IMAGE_REPOSITORY ${TYPO3_VERSION}-php${BASE_IMAGE_TAG}; then
         docker push ${TYPO3_IMAGE_REPOSITORY}:${TYPO3_VERSION}-php${BASE_IMAGE_TAG}
       fi
-
+  
 after_script:
   - docker logout

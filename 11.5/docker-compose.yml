@@ -1,0 +1,38 @@
+version: "3"
+services:
+
+  typo3:
+    image: crinis/typo3:11.5-php8.1-apache
+    volumes:
+      - typo3:/var/www/html/
+    ports:
+      - 80:80
+    networks:
+      - db
+    environment:
+      TYPO3_ADMIN_USERNAME: 'admin'
+      TYPO3_ADMIN_PASSWORD: 'ShouldBeAStrongPassword'
+      TYPO3_DB_HOST: 'mariadb'
+      TYPO3_DB_NAME: 'typo3'
+      TYPO3_DB_USERNAME: 'typo3'
+      TYPO3_DB_PASSWORD: 'ShouldBeAStrongPassword'
+
+  mariadb:
+    image: mariadb:10.5
+    volumes:
+     - mysql:/var/lib/mysql/
+    networks:
+      - db
+    environment:
+      MARIADB_DATABASE: 'typo3'
+      MARIADB_USER: 'typo3'
+      MARIADB_PASSWORD: 'ShouldBeAStrongPassword'
+      MARIADB_ROOT_PASSWORD: 'ShouldBeAStrongPassword'
+    command: '--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci'
+
+networks:
+  db:
+
+volumes:
+  typo3:
+  mysql:

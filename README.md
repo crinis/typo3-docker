@@ -98,7 +98,8 @@ I recommend to use the image tags containing the exact TYPO3 version number incl
 * `7.6.x-php7.1-apache, 7.6-php7.1-apache, 7.6.x, 7.6`
 * `8.7.x-php7.2-apache, 8.7-php7.2-apache, 8.7.x, 8.7`
 * `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x-php7.3-apache, 9.5-php7.3-apache, 9.5.x-php7.4-apache, 9.5-php7.4-apache, 9.5.x, 9.5`
-* `10.4.x-php7.4-apache, 10.4-php7.4-apache, 10.4.x, 10.4, latest`
+* `10.4.x-php7.4-apache, 10.4-php7.4-apache, 10.4.x, 10.4`
+* `11.5.x-php8.1-apache, 11.5-php8.1-apache, 11.5.x, 11.5, latest`
 
 ## Running on Kubernetes
 
