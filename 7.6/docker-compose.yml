@@ -18,7 +18,7 @@ services:
       TYPO3_DB_PASSWORD: 'ShouldBeAStrongPassword'
 
   mysql:
-    image: mysql:5.7
+    image: mysql:5.6
     volumes:
      - mysql:/var/lib/mysql/
     networks:
