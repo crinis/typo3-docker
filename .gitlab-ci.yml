@@ -1,7 +1,7 @@
-image: docker:19.03.1
+image: docker:20.10
 
 services:
-  - docker:19.03.1-dind
+  - docker:20.10-dind
 
 variables:
   TYPO3_IMAGE_REPOSITORY: "crinis/typo3"
