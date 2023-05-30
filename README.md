@@ -4,7 +4,7 @@
 
 ## Project state
 
-The Docker images in this project are not yet production ready and might be modified without backwards compatibility at any time. Make sure to set your deployment image to use specific version tags.
+The Docker images in this project are not yet production ready and might be modified without backwards compatibility at any time.
 
 ## Getting Started
 
