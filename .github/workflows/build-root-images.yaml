@@ -37,8 +37,8 @@ jobs:
         id: get_latest_typo3_version
         run: |
           MAJOR_VERSION=$(echo ${{ matrix.typo3 }} | cut -d. -f1)
-          FULL_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".[\"$MAJOR_VERSION\"].stable")
-          echo "FULL_VERSION=$FULL_VERSION" >> $GITHUB_ENV
+          TYPO3_FULL_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".[\"$MAJOR_VERSION\"].stable")
+          echo "TYPO3_FULL_VERSION=$TYPO3_FULL_VERSION" >> $GITHUB_ENV
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
       - name: Build and push with older php version
         uses: docker/build-push-action@v4
@@ -53,6 +53,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FULL_VERSION }}-php${{ matrix.php }}-apache
           build-args: |
             BASE_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.TYPO3_FULL_VERSION }}
       - name: Build and push latest with latest php version
         uses: docker/build-push-action@v4
         if: matrix.latest != true && matrix.latest_php == true
@@ -69,6 +70,7 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FULL_VERSION }}
           build-args: |
             BASE_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.TYPO3_FULL_VERSION }}
       - name: Build and push latest
         uses: docker/build-push-action@v4
         if: matrix.latest == true
@@ -86,3 +88,4 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
           build-args: |
             BASE_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.TYPO3_FULL_VERSION }}
