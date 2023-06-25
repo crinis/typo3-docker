@@ -90,16 +90,8 @@ docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d
 
 #### Docker Image Tags
 
-I recommend to use the image tags containing the exact TYPO3 version number including patch version like so: crinis/typo3:9.5.18-php7.4-apache. Images specified like that have to be updated manually by changing the tag. It is also possible to specify only the TYPO3 minor version like "crinis/typo3:9.5-php7.2-apache". This image will be regularly rebuild including the latest TYPO3 patch version and base image, but might contain non backwards compatible changes which can lead to application failures.
-
-##### Apache
-
-* `6.2.x-php5.6-apache, 6.2-php5.6-apache, 6.2.x, 6.2`
-* `7.6.x-php7.1-apache, 7.6-php7.1-apache, 7.6.x, 7.6`
-* `8.7.x-php7.2-apache, 8.7-php7.2-apache, 8.7.x, 8.7`
-* `9.5.x-php7.2-apache, 9.5-php7.2-apache, 9.5.x-php7.3-apache, 9.5-php7.3-apache, 9.5.x-php7.4-apache, 9.5-php7.4-apache, 9.5.x, 9.5`
-* `10.4.x-php7.4-apache, 10.4-php7.4-apache, 10.4.x, 10.4`
-* `11.5.x-php8.1-apache, 11.5-php8.1-apache, 11.5.x, 11.5, latest`
+All available tags are listed [here](https://hub.docker.com/repository/docker/crinis/typo3/tags?page=1&ordering=last_updated).
+Be as specific as possible when choosing the image tag for your deployment. Less specific tags can lead to unexpected TYPO3 or PHP versions. Picking `11.5.28-php8.1-apache` makes sure you stay on this exact minor version of TYPO3 and PHP 8.1. If you chose `11.5.28` you might receive an unexpected PHP-Update at some point which breaks your installation.
 
 ## Running on Kubernetes
 
@@ -117,7 +109,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* *Felix Spittel* - *Initial work* - [Crinis](https://github.com/crinis)
+* [Crinis](https://github.com/crinis)
 
 ## License
 
