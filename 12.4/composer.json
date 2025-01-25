@@ -1,0 +1,41 @@
+{
+	"name": "typo3/cms-base-distribution",
+	"description": "TYPO3 CMS Base Distribution",
+	"license": "GPL-2.0-or-later",
+	"type": "project",
+	"config": {
+		"allow-plugins": {
+			"typo3/class-alias-loader": true,
+			"typo3/cms-composer-installers": true
+		},
+		"platform": {
+			"php": "8.4"
+		},
+		"sort-packages": true
+	},
+	"require": {
+		"typo3/cms-backend": "~12.4.0",
+		"typo3/cms-belog": "~12.4.0",
+		"typo3/cms-beuser": "~12.4.0",
+		"typo3/cms-core": "~12.4.0",
+		"typo3/cms-dashboard": "~12.4.0",
+		"typo3/cms-extbase": "~12.4.0",
+		"typo3/cms-extensionmanager": "~12.4.0",
+		"typo3/cms-filelist": "~12.4.0",
+		"typo3/cms-fluid": "~12.4.0",
+		"typo3/cms-fluid-styled-content": "~12.4.0",
+		"typo3/cms-frontend": "~12.4.0",
+		"typo3/cms-impexp": "~12.4.0",
+		"typo3/cms-info": "~12.4.0",
+		"typo3/cms-install": "~12.4.0",
+		"typo3/cms-lowlevel": "~12.4.0",
+		"typo3/cms-redirects": "~12.4.0",
+		"typo3/cms-rte-ckeditor": "~12.4.0",
+		"typo3/cms-scheduler": "~12.4.0",
+		"typo3/cms-setup": "~12.4.0",
+		"typo3/cms-sys-note": "~12.4.0",
+		"typo3/cms-t3editor": "~12.4.0",
+		"typo3/cms-tstemplate": "~12.4.0",
+		"typo3/cms-viewpage": "~12.4.0"
+	}
+}
