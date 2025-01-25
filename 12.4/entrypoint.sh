@@ -4,12 +4,23 @@
 
 set -euo pipefail
 
+# Function to run commands as www-data if running as root.
+#
+# usage: run_as_www_data "command"
+run_as_www_data() {
+    if [ "$(id -u)" -eq 0 ]; then
+        su-exec www-data "$@"
+    else
+        "$@"
+    fi
+}
+
 # Function to check if a package is installed.
 #
 # usage: is_package_installed "package-name"
 #    ie: is_package_installed "helhum/typo3-console"
 is_package_installed() {
-    composer show "$1" > /dev/null 2>&1
+    run_as_www_data composer show "$1" > /dev/null 2>&1
 }
 
 # Function to set environment variables from files.
@@ -36,20 +47,9 @@ file_env() {
 	unset "$fileVar"
 }
 
-# Function to run commands as www-data if running as root.
-#
-# usage: run_as_www_data "command"
-run_as_www_data() {
-    if [ "$(id -u)" -eq 0 ]; then
-        su-exec www-data "$@"
-    else
-        "$@"
-    fi
-}
-
 if [ ! -f composer.json ]; then
-    echo "composer.json not found. Providing a default one."
-    run_as_www_data cp /typo3/composer.json .
+    echo "composer.json not found. Creating new project."
+    run_as_www_data composer create-project typo3/cms-base-distribution . "^12"
 fi
 
 # Secret environment variables that can be set via files.
