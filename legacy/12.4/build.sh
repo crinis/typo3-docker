@@ -22,4 +22,4 @@ for ARG in "$@"; do
     BUILD_ARGS+="--build-arg $ARG "
 done
 
-$TOOL build $BUILD_ARGS -t docker.io/crinis/typo3:12.4 -t docker.io/crinis/typo3:latest .
+$TOOL build $BUILD_ARGS -t docker.io/crinis/typo3:legacy-12.4 -t docker.io/crinis/typo3:legacy .

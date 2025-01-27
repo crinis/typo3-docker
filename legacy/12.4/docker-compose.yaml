@@ -7,9 +7,10 @@
 version: "3"
 services:
   typo3:
-    image: docker.io/crinis/typo3:12.4
+    image: docker.io/crinis/typo3:legacy-12.4
     environment:
       TYPO3_CONTEXT: "Production"
+      MANAGE_SRC: "true"
       TYPO3_DB_HOST: "db"
       TYPO3_DB_PORT: "3306"
       TYPO3_DBNAME: "typo3"
@@ -18,13 +19,12 @@ services:
       TYPO3_SETUP_ADMIN_EMAIL: "admin@example.org"
       TYPO3_SETUP_ADMIN_USERNAME: "admin"
       TYPO3_SETUP_ADMIN_PASSWORD: "#3S3cureP@ssw0rd"
-      COMPOSER_UPDATE: "true"
     volumes:
       - "./html/:/var/www/html/"
     ports:
       - 80:80
   cron:
-    image: docker.io/crinis/typo3:12.4
+    image: docker.io/crinis/typo3:legacy-12.4
     environment:
       TYPO3_CONTEXT: "Production"
     volumes:

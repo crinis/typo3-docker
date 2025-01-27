@@ -1,0 +1,100 @@
+name: build-legacy
+on:
+  workflow_dispatch: {}
+#  schedule:
+#    - cron: "0 6 * * 2"
+
+env:
+  IMAGE_NAME: typo3
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+        include:
+          - typo3: "13.4"
+            latest: true
+          - php: "8.4"
+            latest_php: true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Get full TYPO3 version
+        run: |
+          FEATURE_VERSION="${{ matrix.typo3 }}"
+          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
+          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
+          SHA1=$(curl -s https://get.typo3.org/json | jq -r ".\"${MAJOR_VERSION}\".releases.\"${PATCH_VERSION}\".checksums.tar.sha1")
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+          echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
+          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
+          echo "SHA1=$SHA1" >> $GITHUB_ENV
+
+      - name: Build old TYPO3 release and old compatible PHP release
+        uses: docker/build-push-action@v6
+        if: matrix.latest != true && matrix.latest_php != true
+        with:
+          context: ${{ matrix.typo3 }}/
+          file: ${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.PATCH_VERSION }}
+            TYPO3_SHA1=${{ env.SHA1 }}
+      - name: Build and push old TYPO3 release and latest compatible PHP release
+        uses: docker/build-push-action@v6
+        if: matrix.latest != true && matrix.latest_php == true
+        with:
+          context: ${{ matrix.typo3 }}/
+          file: ${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.PATCH_VERSION }}
+            TYPO3_SHA1=${{ env.SHA1 }}
+      - name: Build and push latest TYPO3 release and latest compatible PHP release
+        uses: docker/build-push-action@v6
+        if: matrix.latest == true && matrix.latest_php == true
+        with:
+          context: ${{ matrix.typo3 }}/
+          file: ${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-latest
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.PATCH_VERSION }}
+            TYPO3_SHA1=${{ env.SHA1 }}

@@ -15,12 +15,12 @@ run_as_www_data() {
     fi
 }
 
-# Function to check if a package is installed.
+# Function to check if an extension is installed.
 #
-# usage: is_package_installed "package-name"
-#    ie: is_package_installed "helhum/typo3-console"
-is_package_installed() {
-    run_as_www_data composer show "${1}" > /dev/null 2>&1
+# usage: is_extension_installed "extension-key"
+#    ie: is_extension_installed "typo3_console"
+is_extension_installed() {
+    run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:list | grep -q "${1}"
 }
 
 # Function to set environment variables from files.
@@ -55,37 +55,30 @@ if [ "$(id -u)" -eq 0 ] && [ "$(stat -c %U /var/www/html)" == "root" ]; then
     chown www-data:www-data /var/www/html
 fi
 
-if [ ! -f /var/www/html/composer.json ]; then
-    echo "composer.json not found. Creating new project."
-    # Sometimes volumes contain files depending on the host system or volume provider. Composer
-    # might fail to install the project because of this. To avoid this, we create the project in
-    # a temporary directory and move it to /var/www/html afterwards.
-    run_as_www_data composer create-project typo3/cms-base-distribution /var/www/html/temp "^12"
-    mv /var/www/html/temp/* /var/www/html/
-    mv /var/www/html/temp/.* /var/www/html/
-    rm -rf /var/www/html/temp
-
-    if ! is_package_installed "typo3/cms-scheduler" ; then
-        echo "Installing typo3/cms-scheduler."
-        run_as_www_data composer require "typo3/cms-scheduler"
-    fi
+# Create public directory if it does not exist.
+if [ ! -d /var/www/html/public ]; then
+    run_as_www_data mkdir /var/www/html/public
 fi
 
-# Run composer install or update based on environment variable
-if [ "${COMPOSER_UPDATE}" == "true" ]; then
-    if [ "${COMPOSER_NO_DEV}" == "true" ]; then
-        run_as_www_data composer update --no-dev --no-interaction
-    else
-        run_as_www_data composer update --no-interaction
-    fi
+# Setup TYPO3 symlinks if $MANAGE_SRC is set to true.
+if [ "${MANAGE_SRC}" == "true" ]; then
+        if [ "$(readlink /var/www/html/public/typo3_src)" != "/typo3/typo3_src-${TYPO3_VERSION}" ]; then
+            echo "Linking /var/www/html/public/typo3_src to updated sources at /typo3/typo3_src-${TYPO3_VERSION}."
+            run_as_www_data ln -sfn "/typo3/typo3_src-${TYPO3_VERSION}" /var/www/html/public/typo3_src
+        fi
 
-    FLUSH_CACHES="true"
-else
-    if [ "${COMPOSER_NO_DEV}" == "true" ]; then
-        run_as_www_data composer install --no-dev --no-interaction
+        if [ ! -f /var/www/html/public/index.php ]; then
+            run_as_www_data ln -s typo3_src/index.php /var/www/html/public/index.php
+        fi
+
+        if [ ! -d /var/www/html/public/typo3 ]; then
+            run_as_www_data ln -s typo3_src/typo3/ /var/www/html/public/typo3
+        fi
+
+        FLUSH_CACHES="true"
+
     else
-        run_as_www_data composer install --no-interaction
-    fi
+        echo "Skipping setting up TYPO3 symlinks as MANAGE_SRC is not set to \"true\"."
 fi
 
 # Secret environment variables that can be set via files.
@@ -100,7 +93,7 @@ file_env "TYPO3_SETUP_ADMIN_PASSWORD"
 
 # Setup TYPO3 via CLI if $SETUP_TYPO3 is set to true and settings.php does not exist.
 if [ "${SETUP_TYPO3}" == "true" ]; then
-    if [ -f /var/www/html/config/system/settings.php ]; then
+    if [ -f /var/www/html/public/typo3conf/system/settings.php ]; then
         echo "Skipping TYPO3 setup as settings.php already exists."
     else
         required_vars=(
@@ -130,7 +123,7 @@ if [ "${SETUP_TYPO3}" == "true" ]; then
 
         echo "Setting up TYPO3..."
 
-        eval "run_as_www_data /var/www/html/vendor/bin/typo3 setup \
+        eval "run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 setup \
             --driver='${TYPO3_DB_DRIVER}' \
             --host='${TYPO3_DB_HOST}' \
             --port='${TYPO3_DB_PORT}' \
@@ -144,20 +137,36 @@ if [ "${SETUP_TYPO3}" == "true" ]; then
             --create-site='${TYPO3_SETUP_CREATE_SITE}' \
             --server-type='apache'"
 
-        if [ ! -f /var/www/html/config/system/additional.php ]; then
-            echo "Copying additional.php to /var/www/html/config/system/additional.php."
-            run_as_www_data cp /typo3/additional.php /var/www/html/config/system/additional.php
+        if [ ! -f /var/www/html/public/typo3conf/system/additional.php ]; then
+            echo "Copying additional.php to /var/www/html/public/typo3conf/system."
+            run_as_www_data cp /typo3/additional.php /var/www/html/public/typo3conf/system/additional.php
+        fi
+
+        if ! is_extension_installed scheduler; then
+            echo "Activating scheduler extension."
+            run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:activate scheduler
         fi
     fi
 fi
 
 # Modify TYPO3 configuration with values of some environment variables if $MODIFY_CONFIGURATION is set to true and settings.php exists.
-if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/config/system/settings.php ] ; then
+if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/public/typo3conf/system/settings.php ] ; then
 
-    if ! is_package_installed "helhum/typo3-console" ; then
-        echo "Installing helhum/typo3-console."
-        run_as_www_data composer require "helhum/typo3-console:${TYPO3_CONSOLE_VERSION}"
-        REMOVE_TYPO3_CONSOLE="true"
+    if ! is_extension_installed "typo3_console" ; then
+        if [ ! -d /var/www/html/public/typo3conf/ext/typo3_console ]; then
+            echo "Copying shipped typo3_console extension."
+            run_as_www_data cp -r /typo3/typo3_console /var/www/html/public/typo3conf/ext/typo3_console
+            REMOVE_TYPO3_CONSOLE="true"
+        fi
+
+        run_as_www_data wait-for-it "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
+            echo "Database is not ready after waiting for 120 seconds."
+            exit 1
+        }
+
+        echo "Activating typo3_console extension."
+        run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:activate typo3_console
+        DEACTIVATE_TYPO3_CONSOLE="true"
     fi
 
     declare -A configMap=(
@@ -174,13 +183,18 @@ if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/config/system/s
     for key in "${!configMap[@]}"; do
         if [ -n "${configMap[$key]}" ]; then
             echo "Setting configuration key $key."
-            eval "run_as_www_data /var/www/html/vendor/bin/typo3 configuration:set $key '${configMap[$key]}'"
+            eval "run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 configuration:set $key '${configMap[$key]}'"
         fi
     done
 
+    if [ "${DEACTIVATE_TYPO3_CONSOLE:-false}" == "true" ]; then
+        echo "Deactivating typo3_console extension."
+        run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:deactivate typo3_console
+    fi
+
     if [ "${REMOVE_TYPO3_CONSOLE:-false}" == "true" ] ; then
-        echo "Removing helhum/typo3-console."
-        run_as_www_data composer remove "helhum/typo3-console"
+        echo "Removing typo3_console extension."
+        rm -rf /var/www/html/public/typo3conf/ext/typo3_console
     fi
 fi
 
@@ -192,14 +206,14 @@ if [ "${FLUSH_CACHES:-false}" == "true" ] || [ "${SETUP_EXTENSIONS}" == "true" ]
 
         if [ "${FLUSH_CACHES:-false}" == "true" ]; then
             echo "Flushing caches."
-            run_as_www_data /var/www/html/vendor/bin/typo3 cache:flush || {
+            run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 cache:flush || {
                 echo "Failed to flush caches. Continue..."
             }
         fi
 
         if [ "${SETUP_EXTENSIONS}" == "true" ]; then
             echo "Setting up extensions."
-            run_as_www_data /var/www/html/vendor/bin/typo3 extension:setup || {
+            run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:setup || {
                 echo "Failed to set up extensions. Continue..."
             }
         fi
@@ -212,7 +226,6 @@ if [ "${FIX_FILE_PERMISSIONS}" == "true" ]; then
     echo "Fixing file permissions."
     find /var/www/html -type d -exec chmod 2770 {} \;
     find /var/www/html -type f -exec chmod 0660 {} \;
-    chmod 0775 /var/www/html/vendor/bin/typo3
 fi
 
 # Unset secret environment variables.
