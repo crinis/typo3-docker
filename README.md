@@ -138,9 +138,9 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 
 For seperation of concerns a second container with the same image can be used to run cronjobs.
 
-On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minues. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [13.4/docker-compose.yaml](docker-compose.yaml) file.
+On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minues. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [docker-compose.yaml](13.4/docker-compose.yaml) file.
 
-On rootless setups we can't use the native cron daemon. Instead [Supercronic](https://github.com/aptible/supercronic) is used. A default "crontab" file is created in "/typo3/crontab" and runs every five minutes. You just need to set the entrypoint to `/usr/local/bin/supercronic /typo3/crontab` as shown in the [13.4/podman-compose.yaml](podman-compose.yaml) file.
+On rootless setups we can't use the native cron daemon. Instead [Supercronic](https://github.com/aptible/supercronic) is used. A default "crontab" file is created in "/typo3/crontab" and runs every five minutes. You just need to set the entrypoint to `/usr/local/bin/supercronic /typo3/crontab` as shown in the [podman-compose.yaml](13.4/podman-compose.yaml) file.
 
 ## Authors
 
