@@ -112,7 +112,6 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 - `12.4-php8.4-apache`
 - `12`
 - `12.4`
-- `latest`
 - `legacy-12-php8.4-apache`
 - `legacy-12.4-php8.4-apache`
 - `legacy-12.4.26-php8.4-apache`
