@@ -1,5 +1,5 @@
-ARG BASE_IMAGE_TAG=8.4-apache
-FROM docker.io/crinis/typo3-php:${BASE_IMAGE_TAG}
+ARG PHP_IMAGE_TAG=8.4-apache
+FROM docker.io/crinis/typo3-php:${PHP_IMAGE_TAG}
 
 RUN mkdir /typo3
 
