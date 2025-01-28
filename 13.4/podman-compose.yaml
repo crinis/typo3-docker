@@ -1,0 +1,57 @@
+# This Podman Compose configuration is an example where the container is run as a non-root user.
+# You are responsible to make sure that files in /var/www/html/ are owned by the right user.
+# The container accepts connections on port 8080.
+# The same image is used for running cron. As we cannot run cron as a non-root user, we use supercronic.
+# The crontab file is located at /typo3/crontab. You can override it by providing your own crontab file as a volume.
+# Run with: podman-compose --in-pod false -f podman-compose.yaml up
+version: "3"
+services:
+  typo3:
+    image: docker.io/crinis/typo3:13.4
+    user: ${DOCKER_UID:-1000}:${DOCKER_GID:-1000}
+    environment:
+      TYPO3_CONTEXT: "Production"
+      TYPO3_DB_HOST: "db"
+      TYPO3_DB_PORT: "3306"
+      TYPO3_DBNAME: "typo3"
+      TYPO3_DB_USERNAME: "typo3"
+      TYPO3_DB_PASSWORD: "s0m3P@ssw0rd"
+      TYPO3_SETUP_ADMIN_EMAIL: "admin@example.org"
+      TYPO3_SETUP_ADMIN_USERNAME: "admin"
+      TYPO3_SETUP_ADMIN_PASSWORD: "#3S3cureP@ssw0rd"
+      COMPOSER_UPDATE: "true"
+    volumes:
+      # Bind mount used rootless. Allow shared access to the volume.
+      - "./html/:/var/www/html/:z"
+      # Named volume used rootless. The volume is created with the same UID and GID as container processes.
+      # - "html:/var/www/html/:U,z"
+    ports:
+      - 8080:8080
+    userns_mode: "keep-id"
+  cron:
+    image: docker.io/crinis/typo3:13.4
+    user: ${DOCKER_UID:-1000}:${DOCKER_GID:-1000}
+    environment:
+      TYPO3_CONTEXT: "Production"
+    volumes:
+      # Bind mount used rootless. Allow shared access to the volume.
+      - "./html/:/var/www/html/:z"
+      # Named volume used rootless. The volume is created with the same UID and GID as container processes.
+      # - "html:/var/www/html/:U,z"
+    userns_mode: "keep-id"
+    entrypoint: ["/usr/local/bin/supercronic"]
+    command: ["/typo3/crontab"]
+  db:
+    image: docker.io/library/mariadb:10.11
+    user: ${DOCKER_UID:-1000}:${DOCKER_GID:-1000}
+    environment:
+      MYSQL_ROOT_PASSWORD: "s0m3r00tP@ssw0rd"
+      MYSQL_DATABASE: "typo3"
+      MYSQL_USER: "typo3"
+      MYSQL_PASSWORD: "s0m3P@ssw0rd"
+    volumes:
+      # Bind mount used rootless. Disallow shared access to the volume.
+      - "./db:/var/lib/mysql/:Z"
+      # Named volume used rootless. The volume is created with the same UID and GID as container processes.
+      # - "./db:/var/lib/mysql/:U,Z"
+    userns_mode: "keep-id"

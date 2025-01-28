@@ -1,0 +1,42 @@
+# This Docker Compose configuration is an example where the container is run as root.
+# It sets file ownership in /var/www/html/ to 'www-data:www-data'
+# when the environment variable SET_OWNER is set to "true".
+# The container accepts connections on port 80.
+# The same image is used for running cron. Location of the crontab file is /var/spool/cron/crontabs/www-data if you
+# want to override it.
+version: "3"
+services:
+  typo3:
+    image: docker.io/crinis/typo3:legacy-13.4
+    environment:
+      TYPO3_CONTEXT: "Production"
+      MANAGE_SRC: "true"
+      TYPO3_DB_HOST: "db"
+      TYPO3_DB_PORT: "3306"
+      TYPO3_DBNAME: "typo3"
+      TYPO3_DB_USERNAME: "typo3"
+      TYPO3_DB_PASSWORD: "s0m3P@ssw0rd"
+      TYPO3_SETUP_ADMIN_EMAIL: "admin@example.org"
+      TYPO3_SETUP_ADMIN_USERNAME: "admin"
+      TYPO3_SETUP_ADMIN_PASSWORD: "#3S3cureP@ssw0rd"
+    volumes:
+      - "./html/:/var/www/html/"
+    ports:
+      - 80:80
+  cron:
+    image: docker.io/crinis/typo3:legacy-13.4
+    environment:
+      TYPO3_CONTEXT: "Production"
+    volumes:
+      - "./html/:/var/www/html/"
+    entrypoint: ["/usr/sbin/cron", "-f"]
+    command: []
+  db:
+    image: docker.io/library/mariadb:10.11
+    environment:
+      MYSQL_ROOT_PASSWORD: "s0m3r00tP@ssw0rd"
+      MYSQL_DATABASE: "typo3"
+      MYSQL_USER: "typo3"
+      MYSQL_PASSWORD: "s0m3P@ssw0rd"
+    volumes:
+      - "./db:/var/lib/mysql/"

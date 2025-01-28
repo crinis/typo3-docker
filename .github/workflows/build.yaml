@@ -14,11 +14,11 @@ jobs:
       matrix:
         typo3:
           - "12.4"
-          # - "13.4"
+          - "13.4"
         php:
           - "8.4"
         include:
-          - typo3: "12.4"
+          - typo3: "13.4"
             latest: true
           - php: "8.4"
             latest_php: true

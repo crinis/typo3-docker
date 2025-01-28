@@ -118,7 +118,21 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 - `legacy-12.4.26-php8.4-apache`
 - `legacy-12`
 - `legacy-12.4`
-- `legacy-12.4.26`
+- `legacy-12.4.26` - Use current patch version
+
+### TYPO3 13
+
+- `13-php8.4-apache`
+- `13.4-php8.4-apache`
+- `13`
+- `13.4`
+- `latest`
+- `legacy-13-php8.4-apache`
+- `legacy-13.4-php8.4-apache`
+- `legacy-13.4.4-php8.4-apache`
+- `legacy-13`
+- `legacy-13.4`
+- `legacy-13.4.4` - Use current patch version
 - `legacy-latest`
 
 ## Cronjobs
