@@ -1,115 +1,120 @@
-# TYPO3 Docker Images
+# TYPO3 Container Images
 
-[Docker Images](https://hub.docker.com/r/crinis/typo3) for most TYPO3 LTS versions
+[Container Images](https://hub.docker.com/r/crinis/typo3) for recent TYPO3 LTS versions
 
 ## Project state
 
-The Docker images in this project are not yet production ready and might be modified without backwards compatibility at any time.
+The Container images in this project are not yet production ready. For stability reasons I recommend forking and building the images yourself or [pulling the image by digest](https://docs.docker.com/reference/cli/docker/image/pull/#pull-an-image-from-docker-hub).
 
-## Getting Started
+## Image types
 
-These instructions cover usage information for the Docker image.
+There are two different types of images in this repository. The default ones are used to manage [Composer](https://getcomposer.org/) based TYPO3 projects. The ones under the [legacy](legacy) directory are used for non-composer based projects.
+I recommend using Composer for new TYPO3 projects.
 
-### Prerequisities
+## Rootless support
 
-In order to run this container you'll need docker installed.
+The images are designed so that they can be run as any non-root user. In that case port "8080" is used. If you run them as root Apache will switch to the "www-data" user and accept connections on port "80".
 
-* [Windows](https://docs.docker.com/windows/started)
-* [OS X](https://docs.docker.com/mac/started/)
-* [Linux](https://docs.docker.com/linux/started/)
+## Prerequisities
 
-### Usage
+In order to run this container you'll need [Docker](https://docs.docker.com/get-started/), [Podman](https://podman.io/getting-started/installation) or a similar container runtime.
 
-#### Quickstart
+## Quickstart
 
-If you use [Docker Compose](https://docs.docker.com/compose/) there is an example [docker-compose.yml](9.5/docker-compose.yml) file in each version specific directory of the repository.
+There is a [docker-compose.yaml](docker-compose.yaml) file for a rootful setup and a [podman-compose.yaml](podman-compose.yaml) file for a rootless setup in each version directory.
 
-Create a Docker network
-```shell
-docker network create typo3-db
+Create a directory for your project and navigate into it. Move the "docker-compose.yaml" or "podman-compose.yaml" file into the directory and run:
+
+```bash
+docker-compose up -f docker-compose.yaml
 ```
 
-Start a MySQL container
+or
 
-```shell
-docker run -d --volume typo3-mysql:/var/lib/mysql/ --network typo3-db \
-    --env MYSQL_DATABASE=typo3 --env MYSQL_USER=typo3 --env MYSQL_PASSWORD=ShouldBeAStrongPassword --env MYSQL_ROOT_PASSWORD=ShouldBeAStrongPassword \
-    --name typo3-mysql mysql:5.7 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+```bash
+podman-compose --in-pod false -f podman-compose.yaml up
 ```
 
-Start the TYPO3 container that is based on the official PHP Docker Image.
+## Usage of Composer based images
 
-```shell
-docker run -d -p 80:80 --volume typo3:/var/www/html/ --network typo3-db \
-    --env TYPO3_DB_HOST=typo3-mysql --env TYPO3_DB_NAME=typo3 --env TYPO3_DB_USERNAME=typo3 --env TYPO3_DB_PASSWORD=ShouldBeAStrongPassword \
-    --env TYPO3_ADMIN_PASSWORD=ShouldBeAStrongPassword \
-    --name typo3 crinis/typo3:9.5-php7.2-apache
-```
+These images make assumptions about the structure of your project that is based when running `composer create-project typo3/cms-base-distribution`. If you have a different structure you might have to adjust the image or your project. If there is no "composer.json" file in the root of your project it will create a new project with the TYPO3 base distribution. Public files are served from the "/var/www/html/public/" directory.
 
-Connect to your Docker host on port 80 and login on /typo3 using the default username "admin" and your password.
+## Usage of legacy images
 
-#### Environment Variables
+These images are based on the official TYPO3 Docker images. They are not recommended for new projects. If you have an existing project that is not based on Composer you can use these images. Public files are served from the "/var/www/html/public/" directory.
 
-* `TYPO3_ADMIN_USERNAME` - Initial admin username when installing TYPO3. (defaults to "admin")
-* `TYPO3_ADMIN_PASSWORD` - Initial admin and Install Tool password when installing TYPO3.
-* `TYPO3_DB_HOST` - Database host.
-* `TYPO3_DB_PORT` - Database port. (defaults to "3306")
-* `TYPO3_DB_NAME` - Database name.
-* `TYPO3_DB_USERNAME` - Database username.
-* `TYPO3_DB_PASSWORD` - Database password.
-* `TYPO3_SITE_NAME` - Sets the sites title. (defaults to "TYPO3 CMS")
-* `TYPO3_CONTEXT` - Could be "Production" or "Development" and is used by TYPO3 to determine if it runs in production or development mode. (defaults to "Production")
-* `MODIFY_LOCAL_CONFIGURATION` - Set to "false" to disable modifications to your LocalConfiguration.php. (defaults to "true")
-* `SETUP_TYPO3_SRC` - Setup symlinks for TYPO3 source that is shipped with the image. (defaults to "true")
-* `SETUP_TYPO3` - Attempts to setup TYPO3 ands adds a basic .htaccess file and cache configuration. (defaults to "true")
+## Environment Variables
 
-#### Secrets
+- `TYPO3_CONTEXT` - Defines the TYPO3 context, can be "Production" or "Development". Defaults to "Production".
+- `TYPO3_PROJECT_NAME` - The name of the TYPO3 project. Defaults to "New TYPO3 Project".
+- `TYPO3_DB_DRIVER` - The database driver to use, typically "mysqli". Defaults to "mysqli".
+- `TYPO3_DB_HOST` - (**Required**) The hostname of the TYPO3 database.
+- `TYPO3_DB_PORT` - The port number of the TYPO3 database. Defaults to 3306.
+- `TYPO3_DBNAME` - (**Required**) The name of the TYPO3 database.
+- `TYPO3_DB_USERNAME` - (**Required**) The username for the TYPO3 database.
+- `TYPO3_DB_PASSWORD` - (**Required**) The password for the TYPO3 database.
+- `TYPO3_SETUP_ADMIN_EMAIL` - (**Required**) The email address of the TYPO3 admin user.
+- `TYPO3_SETUP_ADMIN_USERNAME` - (**Required**) The username of the TYPO3 admin user.
+- `TYPO3_SETUP_ADMIN_PASSWORD` - (**Required**) The password of the TYPO3 admin user.
+- `TYPO3_SETUP_CREATE_SITE` - Option to create a site during setup.
+- `COMPOSER_UPDATE` - If set to "true", it runs `composer update` and updates your Composer dependencies. Only used in Composer based images. Defaults to "false".
+- `COMPOSER_NO_DEV` - If set to "true", skips installing development dependencies. Only used in "composer" images. Defaults to "false".
+- `MODIFY_CONFIGURATION` - If set to "true", modifies TYPO3 configuration based on environment variables. Defaults to "true".
+- `SETUP_TYPO3` - If set to "true", sets up TYPO3 via CLI if settings.php does not exist. Defaults to "true".
+- `SETUP_EXTENSIONS` - If set to "true", sets up TYPO3 extensions. This applies e.g. database schema changes and data imports. Defaults to "false".
+- `FIX_FILE_PERMISSIONS` - If set to "true", sets file and directory permissions to sensible values. Defaults to "true".
+- `SET_OWNER` - If set to "true" and the container is run as "root" recursively sets owner of files in "/var/www/html/" to "www-data". Defaults to "true".
+- `MANAGE_SRC` - If set to "true", the container sets up symbolic links for the TYPO3 source files shipped with the image. TYPO3 sources are only shipped with "legacy" images. Defaults to "true".
+
+## Secrets
 
 Secrets can be mounted into the container as files and referenced by environment variables. If set they override the approriate environment variables above.
+
 ```
-docker run -e TYPO3_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d crinis/typo3:tag
+docker run -e TYPO3_SETUP_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d crinis/typo3:tag
 ```
 
-* `TYPO3_ADMIN_USERNAME_FILE`
-* `TYPO3_ADMIN_PASSWORD_FILE`
-* `TYPO3_DB_HOST_FILE`
-* `TYPO3_DB_PORT_FILE`
-* `TYPO3_DB_NAME_FILE`
-* `TYPO3_DB_USERNAME_FILE`
-* `TYPO3_DB_PASSWORD_FILE`
+- `TYPO3_DB_HOST_FILE` - The hostname of the TYPO3 database.
+- `TYPO3_DB_PORT_FILE` - The port number of the TYPO3 database.
+- `TYPO3_DBNAME_FILE` - The name of the TYPO3 database.
+- `TYPO3_DB_USERNAME_FILE` - The username for the TYPO3 database.
+- `TYPO3_DB_PASSWORD_FILE` - The password for the TYPO3 database.
+- `TYPO3_SETUP_ADMIN_EMAIL_FILE` - The email address of the TYPO3 admin user.
+- `TYPO3_SETUP_ADMIN_USERNAME_FILE` - The username of the TYPO3 admin user.
+- `TYPO3_SETUP_ADMIN_PASSWORD_FILE` - The password of the TYPO3 admin user.
 
-#### Volumes
+## Volumes
 
-* `/var/www/html/` - Contains the TYPO3 installation
+- "/var/www/html/" - Contains the TYPO3 installation
 
-#### Useful File Locations
+For legacy images it is sufficient to mount the "/var/www/html/public/" directory.
 
-* `/docker/AdditionalConfiguration.php` - This file gets copied to /var/www/html/typo3conf/ if no file with that name exist already during TYPO3 setup.
-* `/docker/htaccess` - Gets copied to /var/www/html/ if no file with that name exists already during TYPO3 setup. Only in TYPO3 7.6 and 6.2.
-* `/etc/supervisor/supervisord.conf` - Supervisor configuration file to manage apache and cron processes.
+If you prefer you can also mount subdirectories as own volumes. This might make sense if you want to use a different storage backend for some files.
 
-#### Docker Image Tags
+## Image Tags
 
-All available tags are listed [here](https://hub.docker.com/repository/docker/crinis/typo3/tags?page=1&ordering=last_updated).
-Be as specific as possible when choosing the image tag for your deployment. Less specific tags can lead to unexpected TYPO3 or PHP versions. Picking `11.5.28-php8.1-apache` makes sure you stay on this exact minor version of TYPO3 and PHP 8.1. If you chose `11.5.28` you might receive an unexpected PHP-Update at some point which breaks your installation.
+Tags can be specified in various formats. I recommend being as specific as possible to avoid unexpected updates. To be absolutely certain use the digest of the image or build the image yourself. Make sure to set the latest patch version number of the TYPO3 version you want to use.
 
-## Running on Kubernetes
+Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 
-An experimental Helm Chart is available [here](https://github.com/crinis/typo3-helm-chart). There is no documentation yet so read the values.yaml file for variables.
+### TYPO3 12
 
-## Limitations
-
-### TYPO3 6.2 setup
-
-Images for TYPO3 6.2 do not support automatic setup and configuration of TYPO3. You have to go through installation steps manually and make modifications in LocalConfiguration.php.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/crinis/typo3-docker/tags). 
+- `12-php8.4-apache`
+- `12.4-php8.4-apache`
+- `12`
+- `12.4`
+- `latest`
+- `legacy-12-php8.4-apache`
+- `legacy-12.4-php8.4-apache`
+- `legacy-12.4.26-php8.4-apache`
+- `legacy-12`
+- `legacy-12.4`
+- `legacy-12.4.26`
+- `legacy-latest`
 
 ## Authors
 
-* [Crinis](https://github.com/crinis)
+- [Crinis](https://github.com/crinis)
 
 ## License
 
@@ -117,4 +122,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* This image installs and uses [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) for simple setup and configuration.
+- This image installs and uses [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) for simple setup and configuration.

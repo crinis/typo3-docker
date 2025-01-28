@@ -153,7 +153,6 @@ fi
 
 # Modify TYPO3 configuration with values of some environment variables if $MODIFY_CONFIGURATION is set to true and settings.php exists.
 if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/config/system/settings.php ] ; then
-
     if ! is_package_installed "helhum/typo3-console" ; then
         echo "Installing helhum/typo3-console."
         run_as_www_data composer require "helhum/typo3-console:${TYPO3_CONSOLE_VERSION}"
