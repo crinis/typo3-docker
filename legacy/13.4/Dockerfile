@@ -41,7 +41,7 @@ ENV TYPO3_CONTEXT="Production" \
     SETUP_EXTENSIONS="false" \
     TYPO3_PROJECT_NAME="New TYPO3 Project" \
     TYPO3_SETUP_CREATE_SITE="" \
-    TYPO3_DB_DRIVER="mysqli" \
+    TYPO3_DB_DRIVER="pdoMysql" \
     FIX_FILE_PERMISSIONS="true"
 
 ENTRYPOINT ["typo3-entrypoint"]

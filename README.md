@@ -54,7 +54,7 @@ These images are based on the official TYPO3 Docker images. They are not recomme
 
 - `TYPO3_CONTEXT` - Defines the TYPO3 context, can be "Production" or "Development". Defaults to "Production".
 - `TYPO3_PROJECT_NAME` - The name of the TYPO3 project. Defaults to "New TYPO3 Project".
-- `TYPO3_DB_DRIVER` - The database driver to use, typically "mysqli". Defaults to "mysqli".
+- `TYPO3_DB_DRIVER` - The database driver to use, typically "pdoMysql". Defaults to "pdoMysql".
 - `TYPO3_DB_HOST` - (**Required**) The hostname of the TYPO3 database.
 - `TYPO3_DB_PORT` - The port number of the TYPO3 database. Defaults to 3306.
 - `TYPO3_DBNAME` - (**Required**) The name of the TYPO3 database.
