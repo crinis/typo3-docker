@@ -48,7 +48,7 @@ If there is no "composer.json" file in the root of your project it will create a
 
 ## Usage of legacy images
 
-These images are based on the official TYPO3 Docker images. They are not recommended for new projects. If you have an existing project that is not based on Composer you can use these images. Public files are served from the "/var/www/html/public/" directory.
+Legacy images are not recommended for new projects. If you have an existing project that is not based on Composer you can use these images. Public files are served from the "/var/www/html/public/" directory.
 
 ## Environment Variables
 
