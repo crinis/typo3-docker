@@ -1,4 +1,4 @@
-# TYPO3 Container Images
+# TYPO3 Docker Images
 
 [Container Images](https://hub.docker.com/r/crinis/typo3) for recent TYPO3 LTS versions
 
