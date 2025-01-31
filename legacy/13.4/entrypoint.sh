@@ -177,7 +177,6 @@ if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/public/typo3con
         ["DB/Connections/Default/dbname"]="${TYPO3_DBNAME}"
         ["DB/Connections/Default/user"]="${TYPO3_DB_USERNAME}"
         ["DB/Connections/Default/password"]="${TYPO3_DB_PASSWORD}"
-        ["SYS/sitename"]="${TYPO3_PROJECT_NAME}"
     )
 
     for key in "${!configMap[@]}"; do
