@@ -223,8 +223,8 @@ fi
 
 if [ "${FIX_FILE_PERMISSIONS}" == "true" ]; then
     echo "Fixing file permissions."
-    find /var/www/html -type d -exec chmod 2770 {} \;
-    find /var/www/html -type f -exec chmod 0660 {} \;
+    find /var/www/html -mindepth 1 -type d -exec chmod 2770 {} \;
+    find /var/www/html -mindepth 1 -type f -exec chmod 0660 {} \;
 fi
 
 # Unset secret environment variables.
