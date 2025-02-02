@@ -2,10 +2,6 @@
 
 [Docker Images](https://hub.docker.com/r/crinis/typo3) for recent TYPO3 LTS releases.
 
-## Project state
-
-The Container images in this project are not yet production ready. For stability reasons I recommend forking and building the images yourself or [pulling the image by digest](https://docs.docker.com/reference/cli/docker/image/pull/#pull-an-image-from-docker-hub).
-
 ## Image types
 
 There are two different types of images in this repository. The default ones are used to manage [Composer](https://getcomposer.org/) based TYPO3 projects. 
