@@ -129,19 +129,19 @@ if [ "${SETUP_TYPO3}" == "true" ]; then
 
         echo "Setting up TYPO3..."
 
-        eval "run_as_www_data /var/www/html/vendor/bin/typo3 setup \
-            --driver='${TYPO3_DB_DRIVER}' \
-            --host='${TYPO3_DB_HOST}' \
-            --port='${TYPO3_DB_PORT}' \
-            --username='${TYPO3_DB_USERNAME}' \
-            --password='${TYPO3_DB_PASSWORD}' \
-            --dbname='${TYPO3_DBNAME}' \
-            --admin-email='${TYPO3_SETUP_ADMIN_EMAIL}' \
-            --admin-username='${TYPO3_SETUP_ADMIN_USERNAME}' \
-            --admin-user-password='${TYPO3_SETUP_ADMIN_PASSWORD}' \
-            --project-name='${TYPO3_PROJECT_NAME}' \
-            --create-site='${TYPO3_SETUP_CREATE_SITE}' \
-            --server-type='apache'"
+        run_as_www_data /var/www/html/vendor/bin/typo3 setup \
+            --driver="${TYPO3_DB_DRIVER}" \
+            --host="${TYPO3_DB_HOST}" \
+            --port="${TYPO3_DB_PORT}" \
+            --username="${TYPO3_DB_USERNAME}" \
+            --password="${TYPO3_DB_PASSWORD}" \
+            --dbname="${TYPO3_DBNAME}" \
+            --admin-email="${TYPO3_SETUP_ADMIN_EMAIL}" \
+            --admin-username="${TYPO3_SETUP_ADMIN_USERNAME}" \
+            --admin-user-password="${TYPO3_SETUP_ADMIN_PASSWORD}" \
+            --project-name="${TYPO3_PROJECT_NAME}" \
+            --create-site="${TYPO3_SETUP_CREATE_SITE}" \
+            --server-type="apache"
 
         if [ ! -f /var/www/html/config/system/additional.php ]; then
             echo "Copying additional.php to /var/www/html/config/system/additional.php."
@@ -171,7 +171,7 @@ if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/config/system/s
     for key in "${!configMap[@]}"; do
         if [ -n "${configMap[$key]}" ]; then
             echo "Setting configuration key $key."
-            eval "run_as_www_data /var/www/html/vendor/bin/typo3 configuration:set $key '${configMap[$key]}'"
+            run_as_www_data /var/www/html/vendor/bin/typo3 configuration:set "$key" "${configMap[$key]}"
         fi
     done
 
