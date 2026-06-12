@@ -122,7 +122,7 @@ if [ "${SETUP_TYPO3}" == "true" ]; then
             fi
         done
 
-        run_as_www_data wait-for-it "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
+        run_as_www_data wait-for-it --strict "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
             echo "Database is not ready after waiting for 120 seconds."
             exit 1
         }
@@ -183,7 +183,7 @@ fi
 
 if [ "${FLUSH_CACHES:-false}" == "true" ] || [ "${SETUP_EXTENSIONS}" == "true" ]; then
     if [ -n "${TYPO3_DB_HOST}" ] && [ -n "${TYPO3_DB_PORT}" ]; then
-        run_as_www_data wait-for-it "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
+        run_as_www_data wait-for-it --strict "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
             echo "Database is not ready after waiting for 120 seconds."
         }
 
