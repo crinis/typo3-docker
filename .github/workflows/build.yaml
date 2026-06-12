@@ -135,6 +135,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
     runs-on: ubuntu-24.04
@@ -169,6 +170,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
     runs-on: ubuntu-24.04-arm
@@ -203,6 +205,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
         include:
@@ -263,7 +266,8 @@ jobs:
         run: |
           VERSIONS=$(curl -fsS https://get.typo3.org/json | jq -c '{
               "12.4": (."12" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1}),
-              "13.4": (."13" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1})
+              "13.4": (."13" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1}),
+              "14.3": (."14" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1})
             }')
           echo "versions=$VERSIONS" >> "$GITHUB_OUTPUT"
 
@@ -274,6 +278,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
     runs-on: ubuntu-24.04
@@ -310,6 +315,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
     runs-on: ubuntu-24.04-arm
@@ -346,6 +352,7 @@ jobs:
         typo3:
           - "12.4"
           - "13.4"
+          - "14.3"
         php:
           - "8.4"
         include:
