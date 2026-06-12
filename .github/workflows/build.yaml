@@ -2,13 +2,201 @@ name: build
 on:
   workflow_dispatch: {}
   schedule:
-   - cron: "0 6 * * 2"
+    - cron: "0 5 * * 2"
 
 env:
+  PHP_IMAGE_NAME: typo3-php
   IMAGE_NAME: typo3
 
 jobs:
-  build:
+  build-php-amd64:
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "8.4"
+        include:
+          - php: "8.4"
+            latest_php: true
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        if: matrix.latest_php != true
+        with:
+          context: php/${{ matrix.php }}/apache
+          file: php/${{ matrix.php }}/apache/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-amd64
+
+      - name: Build and push latest
+        uses: docker/build-push-action@v6
+        if: matrix.latest_php == true
+        with:
+          context: php/${{ matrix.php }}/apache
+          file: php/${{ matrix.php }}/apache/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-amd64
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:latest-amd64
+
+  build-php-arm64:
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "8.4"
+        include:
+          - php: "8.4"
+            latest_php: true
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        if: matrix.latest_php != true
+        with:
+          context: php/${{ matrix.php }}/apache
+          file: php/${{ matrix.php }}/apache/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-arm64
+
+      - name: Build and push latest
+        uses: docker/build-push-action@v6
+        if: matrix.latest_php == true
+        with:
+          context: php/${{ matrix.php }}/apache
+          file: php/${{ matrix.php }}/apache/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-arm64
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:latest-arm64
+
+  php-manifests:
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - "8.4"
+        include:
+          - php: "8.4"
+            latest_php: true
+    runs-on: ubuntu-24.04
+    needs: [build-php-amd64, build-php-arm64]
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Create manifest for tag ${{ matrix.php }}-apache and push
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:${{ matrix.php }}-apache-arm64
+
+      - name: Create latest manifest and push
+        if: matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:latest-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.PHP_IMAGE_NAME }}:latest-arm64
+
+  build-typo3-amd64:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+    runs-on: ubuntu-24.04
+    needs: php-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.typo3 }}/
+          file: ${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+
+  build-typo3-arm64:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+    runs-on: ubuntu-24.04-arm
+    needs: php-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.typo3 }}/
+          file: ${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+
+  typo3-manifests:
     strategy:
       fail-fast: false
       matrix:
@@ -22,21 +210,14 @@ jobs:
             latest: true
           - php: "8.4"
             latest_php: true
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    needs: [build-typo3-amd64, build-typo3-arm64]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
 
       - name: Get full TYPO3 version
         run: |
@@ -45,49 +226,174 @@ jobs:
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
           echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
 
-      - name: Build old TYPO3 release and old compatible PHP release
-        uses: docker/build-push-action@v6
-        if: matrix.latest != true && matrix.latest_php != true
-        with:
-          context: ${{ matrix.typo3 }}/
-          file: ${{ matrix.typo3 }}/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
-          build-args: |
-            PHP_IMAGE_TAG=${{ matrix.php }}-apache
-          platforms: linux/amd64, linux/arm64
-
-      - name: Build and push old TYPO3 release and latest compatible PHP release
-        uses: docker/build-push-action@v6
+      - name: Create manifests for old TYPO3 release and push
         if: matrix.latest != true && matrix.latest_php == true
-        with:
-          context: ${{ matrix.typo3 }}/
-          file: ${{ matrix.typo3 }}/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}
-          build-args: |
-            PHP_IMAGE_TAG=${{ matrix.php }}-apache
-          platforms: linux/amd64, linux/arm64
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
 
-      - name: Build and push latest TYPO3 release and latest compatible PHP release
-        uses: docker/build-push-action@v6
+      - name: Create manifests for latest TYPO3 release and push
         if: matrix.latest == true && matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+
+  build-legacy-amd64:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+    runs-on: ubuntu-24.04
+    needs: php-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          context: ${{ matrix.typo3 }}/
-          file: ${{ matrix.typo3 }}/Dockerfile
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get full TYPO3 version
+        run: |
+          FEATURE_VERSION="${{ matrix.typo3 }}"
+          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
+          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
+          SHA1=$(curl -s https://get.typo3.org/json | jq -r ".\"${MAJOR_VERSION}\".releases.\"${PATCH_VERSION}\".checksums.tar.sha1")
+          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
+          echo "SHA1=$SHA1" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: legacy/${{ matrix.typo3 }}/
+          file: legacy/${{ matrix.typo3 }}/Dockerfile
           push: true
-          tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64
           build-args: |
             PHP_IMAGE_TAG=${{ matrix.php }}-apache
-          platforms: linux/amd64, linux/arm64
+            TYPO3_VERSION=${{ env.PATCH_VERSION }}
+            TYPO3_SHA1=${{ env.SHA1 }}
+
+  build-legacy-arm64:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+    runs-on: ubuntu-24.04-arm
+    needs: php-manifests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Get full TYPO3 version
+        run: |
+          FEATURE_VERSION="${{ matrix.typo3 }}"
+          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
+          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
+          SHA1=$(curl -s https://get.typo3.org/json | jq -r ".\"${MAJOR_VERSION}\".releases.\"${PATCH_VERSION}\".checksums.tar.sha1")
+          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
+          echo "SHA1=$SHA1" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: legacy/${{ matrix.typo3 }}/
+          file: legacy/${{ matrix.typo3 }}/Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+          build-args: |
+            PHP_IMAGE_TAG=${{ matrix.php }}-apache
+            TYPO3_VERSION=${{ env.PATCH_VERSION }}
+            TYPO3_SHA1=${{ env.SHA1 }}
+
+  legacy-manifests:
+    strategy:
+      fail-fast: false
+      matrix:
+        typo3:
+          - "12.4"
+          - "13.4"
+        php:
+          - "8.4"
+        include:
+          - typo3: "13.4"
+            latest: true
+          - php: "8.4"
+            latest_php: true
+    runs-on: ubuntu-24.04
+    needs: [build-legacy-amd64, build-legacy-arm64]
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get full TYPO3 version
+        run: |
+          FEATURE_VERSION="${{ matrix.typo3 }}"
+          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
+          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
+          echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
+          echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
+          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
+
+      - name: Create manifests for old TYPO3 release and push
+        if: matrix.latest != true && matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+
+      - name: Create manifests for latest TYPO3 release and push
+        if: matrix.latest == true && matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }} \
+            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-latest \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
