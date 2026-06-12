@@ -20,7 +20,7 @@ The images are designed so that they can be run as any non-root user. In that ca
 
 This includes arbitrary user IDs without an entry in "/etc/passwd", as used by OpenShift. The user ID has to be a member of the root group (GID "0"), which OpenShift sets up automatically. Make sure "/var/www/html/" is group writable if you mount a volume there (on OpenShift this is handled by the "fsGroup" of the pod). Files created by the images are group writable, so restarts with a different user ID of the same group keep working. The Composer cache is stored in "/tmp/composer" (configurable via the `COMPOSER_HOME` environment variable).
 
-For instructions on how to run the TYPO3 scheduler rootless see the [Cronjobs](#cronjobs) section or [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file.
+For instructions on how to run the TYPO3 scheduler rootless see the [Cronjobs](#cronjobs) section or [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/14.3/podman-compose.yaml) file.
 
 ## Prerequisites
 
@@ -28,7 +28,7 @@ In order to run this container you'll need [Docker](https://docs.docker.com/get-
 
 ## Quickstart
 
-There is a [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/docker-compose.yaml) file for a rootful setup and a [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file for a rootless setup in each version directory.
+There is a [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/14.3/docker-compose.yaml) file for a rootful setup and a [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/14.3/podman-compose.yaml) file for a rootless setup in each version directory.
 
 Create a directory for your project and navigate into it. Move the "docker-compose.yaml" or "podman-compose.yaml" file into the directory and run:
 
@@ -108,7 +108,7 @@ Tags can be specified in various formats. I recommend being as specific as possi
 
 To be absolutely certain use the digest of the image or build the image yourself. Make sure to set the latest patch version number of the TYPO3 version you want to use.
 
-Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
+Example: `docker pull crinis/typo3:14.3-php8.4-apache`.
 
 Tags with an "-amd64" or "-arm64" suffix contain a single architecture only and are used to assemble the multi-architecture tags during builds. Use the tags without an architecture suffix instead.
 
@@ -131,22 +131,35 @@ Tags with an "-amd64" or "-arm64" suffix contain a single architecture only and 
 - `13.4-php8.4-apache`
 - `13`
 - `13.4`
-- `latest`
 - `legacy-13-php8.4-apache`
 - `legacy-13.4-php8.4-apache`
 - `legacy-13.4.31-php8.4-apache`
 - `legacy-13`
 - `legacy-13.4`
 - `legacy-13.4.31` - Use current patch version
+
+### TYPO3 14
+
+- `14-php8.4-apache`
+- `14.3-php8.4-apache`
+- `14`
+- `14.3`
+- `latest`
+- `legacy-14-php8.4-apache`
+- `legacy-14.3-php8.4-apache`
+- `legacy-14.3.3-php8.4-apache`
+- `legacy-14`
+- `legacy-14.3`
+- `legacy-14.3.3` - Use current patch version
 - `legacy-latest`
 
 ## Cronjobs
 
 For separation of concerns a second container with the same image can be used to run cronjobs.
 
-On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minutes. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/docker-compose.yaml) file.
+On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minutes. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/14.3/docker-compose.yaml) file.
 
-On rootless setups we can't use the native cron daemon. Instead [Supercronic](https://github.com/aptible/supercronic) is used. A default "crontab" file is created in "/typo3/crontab" and runs every five minutes. You just need to set the entrypoint to `/usr/local/bin/supercronic /typo3/crontab` as shown in the [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file.
+On rootless setups we can't use the native cron daemon. Instead [Supercronic](https://github.com/aptible/supercronic) is used. A default "crontab" file is created in "/typo3/crontab" and runs every five minutes. You just need to set the entrypoint to `/usr/local/bin/supercronic /typo3/crontab` as shown in the [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/14.3/podman-compose.yaml) file.
 
 ## Authors
 
@@ -158,4 +171,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-This image installs and uses [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) for simple setup and configuration.
+The TYPO3 12 and 13 images install and use [TYPO3 Console](https://github.com/TYPO3-Console/TYPO3-Console) to set configuration values. The TYPO3 14 images use the configuration commands of the TYPO3 core.
