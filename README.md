@@ -10,6 +10,10 @@ The ones under the [legacy](https://github.com/crinis/typo3-docker/tree/master/l
 
 I recommend using Composer for new TYPO3 projects. All images are available on [Docker Hub](https://hub.docker.com/r/crinis/typo3) and are built for AMD64 and ARM64 architectures.
 
+### PHP base images
+
+All TYPO3 images build on the PHP images maintained in the [php](php/) directory of this repository. They are published independently as [crinis/typo3-php](https://hub.docker.com/r/crinis/typo3-php) and can also be used on their own, e.g. for local development. See the [PHP image README](php/README.md) for details.
+
 ## Rootless support
 
 The images are designed so that they can be run as any non-root user. In that case port "8080" is used. If you run them as root Apache will switch to the "www-data" user and accept connections on port "80". 
@@ -68,6 +72,7 @@ Legacy images are not recommended for new projects. If you have an existing proj
 - `SETUP_TYPO3` - If set to "true", sets up TYPO3 via CLI if settings.php does not exist. Defaults to "true".
 - `SETUP_EXTENSIONS` - If set to "true", sets up TYPO3 extensions. This applies e.g. database schema changes and data imports. Defaults to "false".
 - `FIX_FILE_PERMISSIONS` - If set to "true", sets file and directory permissions to sensible values. Defaults to "true".
+- `SET_OWNER` - If set to "true" and the container is run as "root", recursively sets the owner of files in "/var/www/html/" to "www-data". This is implemented by the PHP base image entrypoint, which runs after the TYPO3 entrypoint. Defaults to "true".
 - `MANAGE_SRC` - If set to "true", the container sets up symbolic links for the TYPO3 source files shipped with the image. TYPO3 sources are only shipped with "legacy" images. Defaults to "true".
 
 ## Secrets
@@ -91,7 +96,7 @@ docker run -e TYPO3_SETUP_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password 
 
 - "/var/www/html/" - Contains the TYPO3 installation
 
-If the container is run as "root" and "/var/www/html/" is owned by "root" (as is typical for freshly created volumes), the entrypoint changes the ownership of that directory (non-recursively) to "www-data". If you mount additional volumes inside "/var/www/html/" you have to take care of their ownership yourself.
+If the container is run as "root" and "/var/www/html/" is owned by "root" (as is typical for freshly created volumes), the entrypoint changes the ownership of that directory to "www-data". Afterwards the PHP base image entrypoint recursively changes the owner of all files in "/var/www/html/" to "www-data" unless `SET_OWNER` is set to "false". If you disable this and mount additional volumes inside "/var/www/html/" you have to take care of their ownership yourself.
 
 For legacy images it is sufficient to mount the "/var/www/html/public/" directory.
 
