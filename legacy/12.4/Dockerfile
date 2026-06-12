@@ -28,7 +28,7 @@ COPY entrypoint.sh /usr/local/bin/typo3-entrypoint
 COPY wait-for-it.sh /usr/local/bin/wait-for-it
 
 # Setup default cronjob for TYPO3 scheduler and set permissions for files inside /typo3.
-RUN chmod 0755 /usr/local/bin/typo3-entrypoint /usr/local/bin/wait-for-it && \ 
+RUN chmod 0755 /usr/local/bin/typo3-entrypoint /usr/local/bin/wait-for-it && \
     echo "*/5 * * * * /usr/local/bin/php /var/www/html/public/typo3/sysext/core/bin/typo3 scheduler:run" > /var/spool/cron/crontabs/www-data && \
     chmod 0600 /var/spool/cron/crontabs/www-data && \
     echo "*/5 * * * * /usr/local/bin/php /var/www/html/public/typo3/sysext/core/bin/typo3 scheduler:run" > /typo3/crontab && \
