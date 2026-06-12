@@ -1,4 +1,4 @@
-FROM docker.io/library/php:8.4-apache-bookworm
+FROM docker.io/library/php:8.4-apache-trixie
 
 RUN savedAptMark="$(apt-mark showmanual)" && \
     apt-get update && \
@@ -41,9 +41,14 @@ RUN apt-get update && \
         cron \
         unzip \
         wget \
-        unzip \
-        libzip4 \
-        libavif15 \
+        # Runtime library of the intl extension. Unlike on older Debian releases
+        # nothing else depends on it, so it has to be installed explicitly.
+        libicu76 \
+        libzip5 \
+        libavif16 \
+        # Encoder plugin so ImageMagick can also write AVIF files. The decoder
+        # plugins are installed as dependencies of libheif1.
+        libheif-plugin-aomenc \
         jq \
         gosu \
         locales \
