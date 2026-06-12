@@ -209,7 +209,7 @@ jobs:
         php:
           - "8.4"
         include:
-          - typo3: "13.4"
+          - typo3: "14.3"
             latest: true
           - php: "8.4"
             latest_php: true
@@ -356,7 +356,7 @@ jobs:
         php:
           - "8.4"
         include:
-          - typo3: "13.4"
+          - typo3: "14.3"
             latest: true
           - php: "8.4"
             latest_php: true
