@@ -129,19 +129,31 @@ if [ "${SETUP_TYPO3}" == "true" ]; then
 
         echo "Setting up TYPO3..."
 
-        run_as_www_data /var/www/html/vendor/bin/typo3 setup \
-            --driver="${TYPO3_DB_DRIVER}" \
-            --host="${TYPO3_DB_HOST}" \
-            --port="${TYPO3_DB_PORT}" \
-            --username="${TYPO3_DB_USERNAME}" \
-            --password="${TYPO3_DB_PASSWORD}" \
-            --dbname="${TYPO3_DBNAME}" \
-            --admin-email="${TYPO3_SETUP_ADMIN_EMAIL}" \
-            --admin-username="${TYPO3_SETUP_ADMIN_USERNAME}" \
-            --admin-user-password="${TYPO3_SETUP_ADMIN_PASSWORD}" \
-            --project-name="${TYPO3_PROJECT_NAME}" \
-            --create-site="${TYPO3_SETUP_CREATE_SITE}" \
+        setup_args=(
+            --no-interaction
+            --driver="${TYPO3_DB_DRIVER}"
+            --host="${TYPO3_DB_HOST}"
+            --port="${TYPO3_DB_PORT}"
+            --username="${TYPO3_DB_USERNAME}"
+            --password="${TYPO3_DB_PASSWORD}"
+            --dbname="${TYPO3_DBNAME}"
+            --admin-email="${TYPO3_SETUP_ADMIN_EMAIL}"
+            --admin-username="${TYPO3_SETUP_ADMIN_USERNAME}"
+            --admin-user-password="${TYPO3_SETUP_ADMIN_PASSWORD}"
+            --project-name="${TYPO3_PROJECT_NAME}"
             --server-type="apache"
+        )
+
+        # Only request site creation if a URL is given. An empty value makes the setup
+        # command fail and it also reads TYPO3_SETUP_CREATE_SITE from the environment,
+        # so unset the variable when it is empty.
+        if [ -n "${TYPO3_SETUP_CREATE_SITE}" ]; then
+            setup_args+=(--create-site="${TYPO3_SETUP_CREATE_SITE}")
+        else
+            unset TYPO3_SETUP_CREATE_SITE
+        fi
+
+        run_as_www_data /var/www/html/vendor/bin/typo3 setup "${setup_args[@]}"
 
         if [ ! -f /var/www/html/config/system/additional.php ]; then
             echo "Copying additional.php to /var/www/html/config/system/additional.php."
