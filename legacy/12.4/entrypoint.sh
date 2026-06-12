@@ -159,10 +159,12 @@ if [ "${MODIFY_CONFIGURATION}" == "true" ] && [ -f /var/www/html/public/typo3con
             REMOVE_TYPO3_CONSOLE="true"
         fi
 
-        run_as_www_data wait-for-it --strict "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
-            echo "Database is not ready after waiting for 120 seconds."
-            exit 1
-        }
+        if [ -n "${TYPO3_DB_HOST}" ] && [ -n "${TYPO3_DB_PORT}" ]; then
+            run_as_www_data wait-for-it --strict "${TYPO3_DB_HOST}:${TYPO3_DB_PORT}" -t 120 -- echo "Database is ready" || {
+                echo "Database is not ready after waiting for 120 seconds."
+                exit 1
+            }
+        fi
 
         echo "Activating typo3_console extension."
         run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:activate typo3_console
