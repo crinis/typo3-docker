@@ -6,9 +6,9 @@
 
 There are two different types of images in this repository. The default ones are used to manage [Composer](https://getcomposer.org/) based TYPO3 projects. 
 
-The ones under the [legacy](https://github.com/crinis/typo3-docker/blob/master/legacy) directory are used for non-composer based projects.
+The ones under the [legacy](https://github.com/crinis/typo3-docker/tree/master/legacy) directory are used for non-composer based projects.
 
-I recommend using Composer for new TYPO3 projects. All images are available on [Docker Hub](https://hub.docker.com/r/crinis/typo3) and are build for AMD64 and ARM64 architectures.
+I recommend using Composer for new TYPO3 projects. All images are available on [Docker Hub](https://hub.docker.com/r/crinis/typo3) and are built for AMD64 and ARM64 architectures.
 
 ## Rootless support
 
@@ -18,7 +18,7 @@ This includes arbitrary user IDs without an entry in "/etc/passwd", as used by O
 
 For instructions on how to run the TYPO3 scheduler rootless see the [Cronjobs](#cronjobs) section or [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file.
 
-## Prerequisities
+## Prerequisites
 
 In order to run this container you'll need [Docker](https://docs.docker.com/get-started/), [Podman](https://podman.io/getting-started/installation) or a similar container runtime.
 
@@ -29,7 +29,7 @@ There is a [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/mas
 Create a directory for your project and navigate into it. Move the "docker-compose.yaml" or "podman-compose.yaml" file into the directory and run:
 
 ```bash
-docker-compose up -f docker-compose.yaml
+docker compose -f docker-compose.yaml up
 ```
 
 or
@@ -57,23 +57,22 @@ Legacy images are not recommended for new projects. If you have an existing proj
 - `TYPO3_DB_PORT` - The port number of the TYPO3 database. Defaults to 3306.
 - `TYPO3_DBNAME` - (**Required**) The name of the TYPO3 database.
 - `TYPO3_DB_USERNAME` - (**Required**) The username for the TYPO3 database.
-- `TYPO3_DB_PASSWORD` - (**Required**) The password for the TYPO3 database.
+- `TYPO3_DB_PASSWORD` - The password for the TYPO3 database. May be left empty for passwordless database accounts. Defaults to "".
 - `TYPO3_SETUP_ADMIN_EMAIL` - (**Required**) The email address of the TYPO3 admin user.
 - `TYPO3_SETUP_ADMIN_USERNAME` - (**Required**) The username of the TYPO3 admin user.
 - `TYPO3_SETUP_ADMIN_PASSWORD` - (**Required**) The password of the TYPO3 admin user.
 - `TYPO3_SETUP_CREATE_SITE` - Option to create a site during setup.
 - `COMPOSER_UPDATE` - If set to "true", it runs `composer update` and updates your Composer dependencies. Only used in Composer based images. Defaults to "false".
-- `COMPOSER_NO_DEV` - If set to "true", skips installing development dependencies. Only used in "composer" images. Defaults to "false".
+- `COMPOSER_NO_DEV` - If set to "true", skips installing development dependencies. Only used in "composer" images. Defaults to "true".
 - `MODIFY_CONFIGURATION` - If set to "true", modifies TYPO3 configuration based on environment variables. Defaults to "true".
 - `SETUP_TYPO3` - If set to "true", sets up TYPO3 via CLI if settings.php does not exist. Defaults to "true".
 - `SETUP_EXTENSIONS` - If set to "true", sets up TYPO3 extensions. This applies e.g. database schema changes and data imports. Defaults to "false".
 - `FIX_FILE_PERMISSIONS` - If set to "true", sets file and directory permissions to sensible values. Defaults to "true".
-- `SET_OWNER` - If set to "true" and the container is run as "root" recursively sets owner of files in "/var/www/html/" to "www-data". Defaults to "true".
 - `MANAGE_SRC` - If set to "true", the container sets up symbolic links for the TYPO3 source files shipped with the image. TYPO3 sources are only shipped with "legacy" images. Defaults to "true".
 
 ## Secrets
 
-Secrets can be mounted into the container as files and referenced by environment variables. If set they override the approriate environment variables above.
+Secrets can be mounted into the container as files and referenced by environment variables. If set they override the appropriate environment variables above.
 
 ```
 docker run -e TYPO3_SETUP_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password ... -d crinis/typo3:tag
@@ -91,6 +90,8 @@ docker run -e TYPO3_SETUP_ADMIN_PASSWORD_FILE=/run/secrets/typo3-admin-password 
 ## Volumes
 
 - "/var/www/html/" - Contains the TYPO3 installation
+
+If the container is run as "root" and "/var/www/html/" is owned by "root" (as is typical for freshly created volumes), the entrypoint changes the ownership of that directory (non-recursively) to "www-data". If you mount additional volumes inside "/var/www/html/" you have to take care of their ownership yourself.
 
 For legacy images it is sufficient to mount the "/var/www/html/public/" directory.
 
@@ -134,9 +135,9 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 
 ## Cronjobs
 
-For seperation of concerns a second container with the same image can be used to run cronjobs.
+For separation of concerns a second container with the same image can be used to run cronjobs.
 
-On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minues. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/docker-compose.yaml) file.
+On rootful setups a default "/var/spool/cron/crontabs/www-data" file with the TYPO3 scheduler cronjob is created and runs every five minutes. You just need to set the entrypoint to `/usr/sbin/cron -f` as shown in the [docker-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/docker-compose.yaml) file.
 
 On rootless setups we can't use the native cron daemon. Instead [Supercronic](https://github.com/aptible/supercronic) is used. A default "crontab" file is created in "/typo3/crontab" and runs every five minutes. You just need to set the entrypoint to `/usr/local/bin/supercronic /typo3/crontab` as shown in the [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file.
 
