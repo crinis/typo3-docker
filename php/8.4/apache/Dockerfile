@@ -35,6 +35,8 @@ RUN savedAptMark="$(apt-mark showmanual)" && \
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         imagemagick \
+        # Extra codecs so ImageMagick registers and renders the SVG format.
+        libmagickcore-7.q16-10-extra \
         ghostscript \
         nano \
         libyaml-0-2 \
