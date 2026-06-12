@@ -20,7 +20,7 @@ run_as_www_data() {
 # usage: is_extension_installed "extension-key"
 #    ie: is_extension_installed "typo3_console"
 is_extension_installed() {
-    run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:list | grep -q "${1}"
+    run_as_www_data /var/www/html/public/typo3/sysext/core/bin/typo3 extension:list | grep -qw "${1}"
 }
 
 # Function to set environment variables from files.
