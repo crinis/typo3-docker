@@ -14,6 +14,8 @@ I recommend using Composer for new TYPO3 projects. All images are available on [
 
 The images are designed so that they can be run as any non-root user. In that case port "8080" is used. If you run them as root Apache will switch to the "www-data" user and accept connections on port "80". 
 
+This includes arbitrary user IDs without an entry in "/etc/passwd", as used by OpenShift. The user ID has to be a member of the root group (GID "0"), which OpenShift sets up automatically. Make sure "/var/www/html/" is group writable if you mount a volume there (on OpenShift this is handled by the "fsGroup" of the pod). Files created by the images are group writable, so restarts with a different user ID of the same group keep working. The Composer cache is stored in "/tmp/composer" (configurable via the `COMPOSER_HOME` environment variable).
+
 For instructions on how to run the TYPO3 scheduler rootless see the [Cronjobs](#cronjobs) section or [podman-compose.yaml](https://github.com/crinis/typo3-docker/blob/master/13.4/podman-compose.yaml) file.
 
 ## Prerequisities
