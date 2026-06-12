@@ -110,6 +110,8 @@ To be absolutely certain use the digest of the image or build the image yourself
 
 Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 
+Tags with an "-amd64" or "-arm64" suffix contain a single architecture only and are used to assemble the multi-architecture tags during builds. Use the tags without an architecture suffix instead.
+
 ### TYPO3 12
 
 - `12-php8.4-apache`
@@ -118,10 +120,10 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 - `12.4`
 - `legacy-12-php8.4-apache`
 - `legacy-12.4-php8.4-apache`
-- `legacy-12.4.26-php8.4-apache`
+- `legacy-12.4.45-php8.4-apache`
 - `legacy-12`
 - `legacy-12.4`
-- `legacy-12.4.26` - Use current patch version
+- `legacy-12.4.45` - Use current patch version
 
 ### TYPO3 13
 
@@ -132,10 +134,10 @@ Example: `docker pull crinis/typo3:13.4-php8.4-apache`.
 - `latest`
 - `legacy-13-php8.4-apache`
 - `legacy-13.4-php8.4-apache`
-- `legacy-13.4.4-php8.4-apache`
+- `legacy-13.4.31-php8.4-apache`
 - `legacy-13`
 - `legacy-13.4`
-- `legacy-13.4.4` - Use current patch version
+- `legacy-13.4.31` - Use current patch version
 - `legacy-latest`
 
 ## Cronjobs

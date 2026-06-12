@@ -6,6 +6,15 @@ PHP Docker images configured for TYPO3. They are meant as base images for the [T
 
 `SET_OWNER` - If set to "true" and the container is run as "root" recursively sets owner of files in "/var/www/html/" to "www-data". Defaults to "true".
 
+## Image Tags
+
+- `8.4-apache`
+- `latest`
+
+Example: `docker pull crinis/typo3-php:8.4-apache`.
+
+Tags with an "-amd64" or "-arm64" suffix contain a single architecture only and are used to assemble the multi-architecture tags during builds. Use the tags without an architecture suffix instead.
+
 ## Rootless Use
 
 When run rootless the containers accept connections on port 8080 and include [Supercronic](https://github.com/aptible/supercronic) to allow rootless usage.
