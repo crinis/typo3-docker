@@ -219,9 +219,15 @@ fi
 
 if [ "${FIX_FILE_PERMISSIONS}" == "true" ]; then
     echo "Fixing file permissions."
-    find /var/www/html -mindepth 1 -type d -exec chmod 2770 {} \;
-    find /var/www/html -mindepth 1 -type f -exec chmod 0660 {} \;
-    chmod 0775 /var/www/html/vendor/bin/typo3
+    find /var/www/html -mindepth 1 -type d -exec chmod 2770 {} + || {
+        echo "Failed to change permissions of some directories. Continue..."
+    }
+    find /var/www/html -mindepth 1 -type f -exec chmod 0660 {} + || {
+        echo "Failed to change permissions of some files. Continue..."
+    }
+    chmod 0775 /var/www/html/vendor/bin/* || {
+        echo "Failed to change permissions of files in vendor/bin. Continue..."
+    }
 fi
 
 # Unset secret environment variables.
