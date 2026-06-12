@@ -249,6 +249,22 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
 
+  get-typo3-versions:
+    runs-on: ubuntu-24.04
+    outputs:
+      versions: ${{ steps.get.outputs.versions }}
+    steps:
+      # Resolve the patch versions once so all architecture builds and manifests
+      # of a run use the same release even if a new one is published meanwhile.
+      - name: Get current TYPO3 versions
+        id: get
+        run: |
+          VERSIONS=$(curl -fsS https://get.typo3.org/json | jq -c '{
+              "12.4": (."12" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1}),
+              "13.4": (."13" | {patch: .stable, sha1: .releases[.stable].checksums.tar.sha1})
+            }')
+          echo "versions=$VERSIONS" >> "$GITHUB_OUTPUT"
+
   build-legacy-amd64:
     strategy:
       fail-fast: false
@@ -259,7 +275,7 @@ jobs:
         php:
           - "8.4"
     runs-on: ubuntu-24.04
-    needs: php-manifests
+    needs: [php-manifests, get-typo3-versions]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -273,15 +289,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get full TYPO3 version
-        run: |
-          FEATURE_VERSION="${{ matrix.typo3 }}"
-          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
-          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
-          SHA1=$(curl -s https://get.typo3.org/json | jq -r ".\"${MAJOR_VERSION}\".releases.\"${PATCH_VERSION}\".checksums.tar.sha1")
-          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
-          echo "SHA1=$SHA1" >> $GITHUB_ENV
-
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -291,8 +298,8 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64
           build-args: |
             PHP_IMAGE_TAG=${{ matrix.php }}-apache
-            TYPO3_VERSION=${{ env.PATCH_VERSION }}
-            TYPO3_SHA1=${{ env.SHA1 }}
+            TYPO3_VERSION=${{ fromJSON(needs.get-typo3-versions.outputs.versions)[matrix.typo3].patch }}
+            TYPO3_SHA1=${{ fromJSON(needs.get-typo3-versions.outputs.versions)[matrix.typo3].sha1 }}
 
   build-legacy-arm64:
     strategy:
@@ -304,7 +311,7 @@ jobs:
         php:
           - "8.4"
     runs-on: ubuntu-24.04-arm
-    needs: php-manifests
+    needs: [php-manifests, get-typo3-versions]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -318,15 +325,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get full TYPO3 version
-        run: |
-          FEATURE_VERSION="${{ matrix.typo3 }}"
-          MAJOR_VERSION="${FEATURE_VERSION%%.*}"
-          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
-          SHA1=$(curl -s https://get.typo3.org/json | jq -r ".\"${MAJOR_VERSION}\".releases.\"${PATCH_VERSION}\".checksums.tar.sha1")
-          echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
-          echo "SHA1=$SHA1" >> $GITHUB_ENV
-
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -336,8 +334,8 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
           build-args: |
             PHP_IMAGE_TAG=${{ matrix.php }}-apache
-            TYPO3_VERSION=${{ env.PATCH_VERSION }}
-            TYPO3_SHA1=${{ env.SHA1 }}
+            TYPO3_VERSION=${{ fromJSON(needs.get-typo3-versions.outputs.versions)[matrix.typo3].patch }}
+            TYPO3_SHA1=${{ fromJSON(needs.get-typo3-versions.outputs.versions)[matrix.typo3].sha1 }}
 
   legacy-manifests:
     strategy:
@@ -354,7 +352,7 @@ jobs:
           - php: "8.4"
             latest_php: true
     runs-on: ubuntu-24.04
-    needs: [build-legacy-amd64, build-legacy-arm64]
+    needs: [build-legacy-amd64, build-legacy-arm64, get-typo3-versions]
     steps:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -366,7 +364,7 @@ jobs:
         run: |
           FEATURE_VERSION="${{ matrix.typo3 }}"
           MAJOR_VERSION="${FEATURE_VERSION%%.*}"
-          PATCH_VERSION=$(curl https://get.typo3.org/json -s | jq -r ".\"${MAJOR_VERSION}\".stable")
+          PATCH_VERSION="${{ fromJSON(needs.get-typo3-versions.outputs.versions)[matrix.typo3].patch }}"
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
           echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
           echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
