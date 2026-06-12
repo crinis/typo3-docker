@@ -1,4 +1,4 @@
-#!/usr/bin/zsh
+#!/bin/bash
 #
 # Builds TYPO3-PHP Docker images locally
 
