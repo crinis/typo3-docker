@@ -11,7 +11,7 @@ RUN chmod 0755 /usr/local/bin/typo3-entrypoint /usr/local/bin/wait-for-it && \
     echo "*/5 * * * * /usr/local/bin/php /var/www/html/vendor/bin/typo3 scheduler:run" > /var/spool/cron/crontabs/www-data && \
     chmod 0600 /var/spool/cron/crontabs/www-data && \
     echo "*/5 * * * * /usr/local/bin/php /var/www/html/vendor/bin/typo3 scheduler:run" > /typo3/crontab && \
-    chmod 0664 /typo3/crontab /typo3/additional.php && \
+    chmod 0644 /typo3/crontab /typo3/additional.php && \
     # Allow running with an arbitrary user ID that is a member of the root group,
     # e.g. on OpenShift, where /var/www/html may not be a mounted volume.
     chgrp 0 /var/www/html && \
