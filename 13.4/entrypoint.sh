@@ -61,9 +61,8 @@ if [ ! -f /var/www/html/composer.json ]; then
     # might fail to install the project because of this. To avoid this, we create the project in
     # a temporary directory and move it to /var/www/html afterwards.
     run_as_www_data composer create-project typo3/cms-base-distribution /var/www/html/temp "^13"
-    mv /var/www/html/temp/* /var/www/html/
-    mv /var/www/html/temp/.* /var/www/html/
-    rm -rf /var/www/html/temp
+    run_as_www_data find /var/www/html/temp -mindepth 1 -maxdepth 1 -exec mv -t /var/www/html/ {} +
+    run_as_www_data rm -rf /var/www/html/temp
 
     if ! is_package_installed "typo3/cms-scheduler" ; then
         echo "Installing typo3/cms-scheduler."
