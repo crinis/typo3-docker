@@ -226,25 +226,27 @@ jobs:
           echo "MAJOR_VERSION=$MAJOR_VERSION" >> $GITHUB_ENV
           echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
 
-      - name: Create manifests for old TYPO3 release and push
-        if: matrix.latest != true && matrix.latest_php == true
+      - name: Create manifests and push
         run: |
           docker buildx imagetools create \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+
+      - name: Create manifests for latest PHP release and push
+        if: matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
 
-      - name: Create manifests for latest TYPO3 release and push
+      - name: Create latest manifest and push
         if: matrix.latest == true && matrix.latest_php == true
         run: |
           docker buildx imagetools create \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.MAJOR_VERSION }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ env.FEATURE_VERSION }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
@@ -369,29 +371,29 @@ jobs:
           echo "FEATURE_VERSION=$FEATURE_VERSION" >> $GITHUB_ENV
           echo "PATCH_VERSION=$PATCH_VERSION" >> $GITHUB_ENV
 
-      - name: Create manifests for old TYPO3 release and push
-        if: matrix.latest != true && matrix.latest_php == true
+      - name: Create manifests and push
         run: |
           docker buildx imagetools create \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
+
+      - name: Create manifests for latest PHP release and push
+        if: matrix.latest_php == true
+        run: |
+          docker buildx imagetools create \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }} \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
 
-      - name: Create manifests for latest TYPO3 release and push
+      - name: Create latest manifest and push
         if: matrix.latest == true && matrix.latest_php == true
         run: |
           docker buildx imagetools create \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }}-php${{ matrix.php }}-apache \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }}-php${{ matrix.php }}-apache \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }}-php${{ matrix.php }}-apache \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.MAJOR_VERSION }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.FEATURE_VERSION }} \
-            -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ env.PATCH_VERSION }} \
             -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-latest \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-amd64 \
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:legacy-${{ matrix.typo3 }}-php${{ matrix.php }}-apache-arm64
