@@ -4,7 +4,6 @@
 # The container accepts connections on port 80.
 # The same image is used for running cron. Location of the crontab file is /var/spool/cron/crontabs/www-data if you
 # want to override it.
-version: "3"
 services:
   typo3:
     image: docker.io/crinis/typo3:13.4

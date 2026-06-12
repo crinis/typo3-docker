@@ -4,7 +4,6 @@
 # The same image is used for running cron. As we cannot run cron as a non-root user, we use supercronic.
 # The crontab file is located at /typo3/crontab. You can override it by providing your own crontab file as a volume.
 # Run with: podman-compose --in-pod false -f podman-compose.yaml up
-version: "3"
 services:
   typo3:
     image: docker.io/crinis/typo3:legacy-13.4
