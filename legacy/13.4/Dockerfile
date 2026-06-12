@@ -15,9 +15,9 @@ RUN curl -fsSL "https://get.typo3.org/${TYPO3_VERSION}" -o "typo3_src-${TYPO3_VE
     rm "typo3_src-${TYPO3_VERSION}.tar.gz"
 
 # Download and extract TYPO3 Console.
-ENV TYPO3_CONSOLE_VERSION="8.2.2"
+ENV TYPO3_CONSOLE_VERSION="9.0.0"
 RUN curl -fsSL "https://extensions.typo3.org/extension/download/typo3_console/${TYPO3_CONSOLE_VERSION}/zip/" -o "typo3_console_${TYPO3_CONSOLE_VERSION}.zip" && \
-    echo "bc85b9eb7f8dbb4d48aab3d2b2360db5f7dee71f typo3_console_${TYPO3_CONSOLE_VERSION}.zip" | sha1sum -c - && \
+    echo "9fe35eac0faea707221e13baa666a462dab744b7 typo3_console_${TYPO3_CONSOLE_VERSION}.zip" | sha1sum -c - && \
     unzip "typo3_console_${TYPO3_CONSOLE_VERSION}.zip" -d /typo3/typo3_console && \
     rm "typo3_console_${TYPO3_CONSOLE_VERSION}.zip" && \
     # We have to set it to unprotected so we can cleanup properly after use.
