@@ -12,7 +12,7 @@ services:
       TYPO3_CONTEXT: "Production"
     volumes:
       # Bind mount used rootless. Allow shared access to the volume.
-      - "./html/:/var/www/html/:z"
+      - "/tmp/typo3-docker/php-8.4-apache/html/:/var/www/html/:z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
       # - "html:/var/www/html/:U,z"
     ports:
@@ -25,8 +25,8 @@ services:
       TYPO3_CONTEXT: "Production"
     volumes:
       # Bind mount used rootless. Allow shared access to the volume.
-      - "./html/:/var/www/html/:z"
-      - "./crontab:/typo3/crontab:z"
+      - "/tmp/typo3-docker/php-8.4-apache/html/:/var/www/html/:z"
+      - "/tmp/typo3-docker/php-8.4-apache/crontab:/typo3/crontab:z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
       # - "html:/var/www/html/:U,z"
     userns_mode: "keep-id"
@@ -42,7 +42,7 @@ services:
       MYSQL_PASSWORD: "s0m3P@ssw0rd"
     volumes:
       # Bind mount used rootless. Disallow shared access to the volume.
-      - "./db:/var/lib/mysql/:Z"
+      - "/tmp/typo3-docker/php-8.4-apache/db:/var/lib/mysql/:Z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
-      # - "./db:/var/lib/mysql/:U,Z"
+      # - "/tmp/typo3-docker/php-8.4-apache/db:/var/lib/mysql/:U,Z"
     userns_mode: "keep-id"

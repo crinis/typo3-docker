@@ -18,10 +18,11 @@ services:
       TYPO3_SETUP_ADMIN_EMAIL: "admin@example.org"
       TYPO3_SETUP_ADMIN_USERNAME: "admin"
       TYPO3_SETUP_ADMIN_PASSWORD: "#3S3cureP@ssw0rd"
+      TYPO3_SETUP_CREATE_SITE: "http://localhost:8080/"
       COMPOSER_UPDATE: "true"
     volumes:
       # Bind mount used rootless. Allow shared access to the volume.
-      - "./html/:/var/www/html/:z"
+      - "/tmp/typo3-docker/13.4/html/:/var/www/html/:z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
       # - "html:/var/www/html/:U,z"
     ports:
@@ -34,7 +35,7 @@ services:
       TYPO3_CONTEXT: "Production"
     volumes:
       # Bind mount used rootless. Allow shared access to the volume.
-      - "./html/:/var/www/html/:z"
+      - "/tmp/typo3-docker/13.4/html/:/var/www/html/:z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
       # - "html:/var/www/html/:U,z"
     userns_mode: "keep-id"
@@ -50,7 +51,7 @@ services:
       MYSQL_PASSWORD: "s0m3P@ssw0rd"
     volumes:
       # Bind mount used rootless. Disallow shared access to the volume.
-      - "./db:/var/lib/mysql/:Z"
+      - "/tmp/typo3-docker/13.4/db:/var/lib/mysql/:Z"
       # Named volume used rootless. The volume is created with the same UID and GID as container processes.
-      # - "./db:/var/lib/mysql/:U,Z"
+      # - "/tmp/typo3-docker/13.4/db:/var/lib/mysql/:U,Z"
     userns_mode: "keep-id"
